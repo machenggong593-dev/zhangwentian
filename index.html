@@ -460,13 +460,12 @@
     }
 
     .end {
-      min-height: 72svh;
+      min-height: 100svh;
       display: grid;
-      place-items: center;
+      align-items: center;
       padding: 72px 7vw;
       background: #2f2a24;
       color: #f7ead3;
-      text-align: center;
     }
 
     .end p {
@@ -474,6 +473,161 @@
       max-width: 720px;
       font-size: clamp(21px, 4vw, 36px);
       line-height: 1.65;
+    }
+
+    .end-inner {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 30px;
+    }
+
+    .end-copy {
+      text-align: center;
+      justify-self: center;
+    }
+
+    .ai-lab {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.76fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .ai-tool,
+    .video-drop {
+      border: 1px solid rgba(247, 234, 211, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 248, 232, 0.08);
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.18);
+      padding: 18px;
+    }
+
+    .ai-tool h2,
+    .video-drop h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .prompt-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .prompt-tab,
+    .ai-action,
+    .upload-button {
+      border: 1px solid rgba(247, 234, 211, 0.28);
+      border-radius: 6px;
+      color: #f7ead3;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .prompt-tab {
+      padding: 8px 11px;
+      font-size: 14px;
+    }
+
+    .prompt-tab.active,
+    .ai-action.primary {
+      border-color: rgba(201, 146, 63, 0.8);
+      background: rgba(143, 31, 27, 0.5);
+    }
+
+    .prompt-box {
+      width: 100%;
+      min-height: 142px;
+      resize: vertical;
+      border: 1px solid rgba(247, 234, 211, 0.22);
+      border-radius: 8px;
+      padding: 12px;
+      color: #2d241d;
+      background: rgba(255, 248, 232, 0.94);
+      font-size: 15px;
+      line-height: 1.7;
+      font-family: inherit;
+    }
+
+    .ai-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .ai-action,
+    .upload-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .copy-state,
+    .upload-state {
+      min-height: 20px;
+      color: rgba(247, 234, 211, 0.78);
+      font-size: 13px;
+    }
+
+    .video-frame {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      max-height: 52svh;
+      border-radius: 8px;
+      background:
+        linear-gradient(145deg, rgba(247, 234, 211, 0.18), rgba(0, 0, 0, 0.18)),
+        #221d18;
+    }
+
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      display: none;
+      object-fit: cover;
+    }
+
+    .video-frame.has-video video {
+      display: block;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      color: rgba(247, 234, 211, 0.72);
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .video-frame.has-video .video-placeholder {
+      display: none;
+    }
+
+    .video-input {
+      display: none;
+    }
+
+    .upload-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
     }
 
     @media (max-width: 720px) {
@@ -551,6 +705,14 @@
       .timeline {
         bottom: 2svh;
       }
+
+      .ai-lab {
+        grid-template-columns: 1fr;
+      }
+
+      .video-frame {
+        max-height: none;
+      }
     }
   </style>
 </head>
@@ -600,7 +762,33 @@
     </section>
 
     <section class="end">
-      <p>借用外来，扎根民间，源于劳动。三首歌连成一条声脉，也照见文艺走向人民的道路。</p>
+      <div class="end-inner">
+        <p class="end-copy">借用外来，扎根民间，源于劳动。三首歌连成一条声脉，也照见文艺走向人民的道路。</p>
+        <div class="ai-lab" aria-label="AI视频共创">
+          <div class="ai-tool">
+            <h2>AI视频共创</h2>
+            <div class="prompt-tabs" id="promptTabs" aria-label="选择视频场景"></div>
+            <textarea class="prompt-box" id="promptBox" aria-label="即梦视频提示词"></textarea>
+            <div class="ai-actions">
+              <button class="ai-action primary" id="copyPrompt" type="button">复制提示词</button>
+              <a class="ai-action" href="https://jimeng.jianying.com/" target="_blank" rel="noopener noreferrer">去即梦生成</a>
+              <span class="copy-state" id="copyState"></span>
+            </div>
+          </div>
+          <div class="video-drop">
+            <h2>播放生成视频</h2>
+            <div class="video-frame" id="videoFrame">
+              <video id="userVideo" controls playsinline></video>
+              <div class="video-placeholder">上传即梦生成的视频后，在这里播放。</div>
+            </div>
+            <div class="upload-row">
+              <label class="upload-button" for="videoUpload">上传视频</label>
+              <input class="video-input" id="videoUpload" type="file" accept="video/mp4,video/webm,video/quicktime,video/*">
+              <span class="upload-state" id="uploadState"></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -694,6 +882,14 @@
     const timelineFill = document.getElementById("timelineFill");
     const intro = document.querySelector(".intro");
     const introMap = document.querySelector(".intro-map");
+    const promptTabs = document.getElementById("promptTabs");
+    const promptBox = document.getElementById("promptBox");
+    const copyPrompt = document.getElementById("copyPrompt");
+    const copyState = document.getElementById("copyState");
+    const videoUpload = document.getElementById("videoUpload");
+    const userVideo = document.getElementById("userVideo");
+    const videoFrame = document.getElementById("videoFrame");
+    const uploadState = document.getElementById("uploadState");
     let activeIndex = -1;
     let scrollStopTimer = 0;
     let isScrolling = false;
@@ -732,6 +928,68 @@
     const sceneImages = [...document.querySelectorAll(".scene-img")];
     const dotButtons = [...document.querySelectorAll(".dot")];
     const runWhenIdle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 500));
+    const videoPrompts = [
+      {
+        label: "导入",
+        text: "一幅温暖复古风格的中国地图，红色路线从上海出发，经过延安，最后到达东北合江。画面有纸张纹理和历史展览感，红线缓慢延展，庄重、柔和、音乐综合课导入氛围，无现代建筑，无字幕。"
+      },
+      {
+        label: "上海",
+        text: "20世纪初上海新式学堂场景，青年学生在教室中唱歌，窗外有五四时期的城市氛围。画面表现学堂乐歌《送别》的启蒙气质，中西结合、兼收并蓄，张闻天青年时代在这样的歌声中成长。复古插画风，镜头缓慢推进，无字幕。"
+      },
+      {
+        label: "陕北",
+        text: "1940年代陕北黄河岸边，船工在黄河上拉纤、划船，众人配合呼喊号子。风沙、河浪、黄土高坡，表现《黄河船夫曲》的粗犷豪迈，根植乡土、魂系家国。音乐家深入民间，用人民熟悉的旋律唱出革命信念，无字幕。"
+      },
+      {
+        label: "合江",
+        text: "1940年代东北合江佳木斯工厂，工人们在车间中集体劳动，机器运转，火花和蒸汽。表现《咱们工人有力量》的劳动号子气质，讴歌劳动、质朴铿锵。张闻天鼓励文艺工作者到工人中间去，艺术从生活中来，复古宣传画风，无字幕。"
+      }
+    ];
+
+    function setPrompt(index) {
+      const prompt = videoPrompts[index];
+      promptBox.value = prompt.text;
+      [...promptTabs.children].forEach((tab, tabIndex) => {
+        tab.classList.toggle("active", tabIndex === index);
+      });
+      copyState.textContent = "";
+    }
+
+    videoPrompts.forEach((prompt, index) => {
+      const button = document.createElement("button");
+      button.className = "prompt-tab";
+      button.type = "button";
+      button.textContent = prompt.label;
+      button.addEventListener("click", () => setPrompt(index));
+      promptTabs.appendChild(button);
+    });
+    setPrompt(0);
+
+    copyPrompt.addEventListener("click", async () => {
+      promptBox.focus();
+      promptBox.select();
+      try {
+        await navigator.clipboard.writeText(promptBox.value);
+        copyState.textContent = "已复制";
+      } catch (error) {
+        document.execCommand("copy");
+        copyState.textContent = "已复制";
+      }
+    });
+
+    videoUpload.addEventListener("change", () => {
+      const file = videoUpload.files && videoUpload.files[0];
+      if (!file) return;
+      if (userVideo.dataset.objectUrl) {
+        URL.revokeObjectURL(userVideo.dataset.objectUrl);
+      }
+      const objectUrl = URL.createObjectURL(file);
+      userVideo.dataset.objectUrl = objectUrl;
+      userVideo.src = objectUrl;
+      videoFrame.classList.add("has-video");
+      uploadState.textContent = file.name;
+    });
 
     function loadChapterAssets(index) {
       const chapter = chapters[index];
