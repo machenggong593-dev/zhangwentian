@@ -108,7 +108,6 @@
       stroke-dasharray: 1420;
       stroke-dashoffset: 1420;
       filter: drop-shadow(0 3px 2px rgba(112, 18, 15, 0.28));
-      animation: drawRoute 4.6s 0.45s ease-out forwards;
     }
 
     .intro-route-halo {
@@ -119,7 +118,6 @@
       stroke-linejoin: round;
       stroke-dasharray: 1420;
       stroke-dashoffset: 1420;
-      animation: drawRoute 4.6s 0.45s ease-out forwards;
     }
 
     .route-point {
@@ -129,12 +127,20 @@
       transform-box: fill-box;
       transform-origin: center;
       opacity: 0;
-      animation: popPoint 420ms ease forwards;
     }
 
     .route-point:nth-of-type(1) { animation-delay: 0.55s; }
     .route-point:nth-of-type(2) { animation-delay: 2.55s; }
     .route-point:nth-of-type(3) { animation-delay: 5s; }
+
+    .intro-map.is-playing .intro-route,
+    .intro-map.is-playing .intro-route-halo {
+      animation: drawRoute 4.6s 0.45s ease-out forwards;
+    }
+
+    .intro-map.is-playing .route-point {
+      animation: popPoint 420ms ease forwards;
+    }
 
     @keyframes drawRoute {
       to { stroke-dashoffset: 0; }
@@ -686,6 +692,8 @@
     const note = document.getElementById("note");
     const chapterLabel = document.getElementById("chapterLabel");
     const timelineFill = document.getElementById("timelineFill");
+    const intro = document.querySelector(".intro");
+    const introMap = document.querySelector(".intro-map");
     let activeIndex = -1;
     let scrollStopTimer = 0;
     let isScrolling = false;
@@ -797,6 +805,22 @@
       update();
     }, { passive: true });
     window.addEventListener("resize", update);
+    function replayIntroRoute() {
+      introMap.classList.remove("is-playing");
+      void introMap.offsetWidth;
+      introMap.classList.add("is-playing");
+    }
+
+    const introObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
+          replayIntroRoute();
+        }
+      });
+    }, { threshold: [0.55] });
+
+    introObserver.observe(intro);
+    replayIntroRoute();
     update();
   </script>
 </body>
