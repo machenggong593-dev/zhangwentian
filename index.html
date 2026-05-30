@@ -63,9 +63,9 @@
 
     .intro-map {
       position: absolute;
-      right: clamp(8px, 4vw, 56px);
+      right: clamp(-150px, -8vw, -24px);
       top: 50%;
-      width: min(860px, 68vw);
+      width: min(1120px, 84vw);
       aspect-ratio: 1344 / 1195;
       transform: translateY(-50%);
       z-index: 0;
@@ -97,7 +97,7 @@
       stroke-dasharray: 1420;
       stroke-dashoffset: 1420;
       filter: drop-shadow(0 3px 2px rgba(112, 18, 15, 0.28));
-      animation: drawRoute 2.8s 0.45s ease-out forwards;
+      animation: drawRoute 4.6s 0.45s ease-out forwards;
     }
 
     .intro-route-halo {
@@ -108,7 +108,7 @@
       stroke-linejoin: round;
       stroke-dasharray: 1420;
       stroke-dashoffset: 1420;
-      animation: drawRoute 2.8s 0.45s ease-out forwards;
+      animation: drawRoute 4.6s 0.45s ease-out forwards;
     }
 
     .route-point {
@@ -122,8 +122,8 @@
     }
 
     .route-point:nth-of-type(1) { animation-delay: 0.55s; }
-    .route-point:nth-of-type(2) { animation-delay: 1.65s; }
-    .route-point:nth-of-type(3) { animation-delay: 3s; }
+    .route-point:nth-of-type(2) { animation-delay: 2.55s; }
+    .route-point:nth-of-type(3) { animation-delay: 5s; }
 
     @keyframes drawRoute {
       to { stroke-dashoffset: 0; }
@@ -474,8 +474,8 @@
       .intro-map {
         right: 50%;
         top: auto;
-        bottom: 7vh;
-        width: min(600px, 122vw);
+        bottom: 5vh;
+        width: min(760px, 148vw);
         transform: translateX(50%);
         opacity: 0.7;
       }
@@ -543,10 +543,10 @@
       <div class="intro-map" aria-hidden="true">
         <img src="assets/home-map.png" alt="" decoding="async" />
         <svg viewBox="0 0 1344 1195" role="presentation" focusable="false">
-          <path class="intro-route-halo" d="M1107 669 C1034 631 928 582 796 540 C904 427 1028 310 1239 210" />
-          <path class="intro-route" d="M1107 669 C1034 631 928 582 796 540 C904 427 1028 310 1239 210" />
+          <path class="intro-route-halo" d="M1107 669 C1028 635 908 588 780 540 C902 424 1042 306 1239 210" />
+          <path class="intro-route" d="M1107 669 C1028 635 908 588 780 540 C902 424 1042 306 1239 210" />
           <circle class="route-point" cx="1107" cy="669" r="13" />
-          <circle class="route-point" cx="793" cy="539" r="13" />
+          <circle class="route-point" cx="780" cy="540" r="13" />
           <circle class="route-point" cx="1239" cy="210" r="13" />
         </svg>
       </div>
