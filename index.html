@@ -268,7 +268,7 @@
     .road {
       position: absolute;
       inset: -105% 0;
-      background-image: url("https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/assets/roads/dirt.webp");
+      background-image: none;
       background-position: center top;
       background-size: var(--road-size, cover);
       background-repeat: var(--road-repeat, repeat-y);
@@ -763,7 +763,7 @@
         </article>
 
         <div class="character" aria-hidden="true">
-          <img id="person" src="https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/assets/characters/child-1.webp" alt="" />
+          <img id="person" src="assets/characters/child-1.webp" alt="" decoding="async" />
         </div>
 
         <nav class="progress" id="dots" aria-label="人生节点导航"></nav>
@@ -805,7 +805,7 @@
 
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
-    const ASSET_VERSION = "road-v2";
+    const ASSET_VERSION = "perf-v1";
     const asset = (path) => {
       if (location.protocol === "file:") return path;
       return `${CDN_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
