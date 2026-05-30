@@ -55,23 +55,23 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(90deg, rgba(248, 239, 217, 0.96) 0%, rgba(248, 239, 217, 0.8) 36%, rgba(248, 239, 217, 0.28) 72%),
-        radial-gradient(circle at 80% 46%, rgba(143, 31, 27, 0.16), transparent 34rem);
+        linear-gradient(90deg, rgba(248, 239, 217, 0.9) 0%, rgba(248, 239, 217, 0.62) 38%, rgba(248, 239, 217, 0.08) 76%),
+        radial-gradient(circle at 73% 48%, rgba(143, 31, 27, 0.12), transparent 36rem);
       z-index: 0;
       pointer-events: none;
     }
 
     .intro-map {
       position: absolute;
-      right: clamp(-150px, -8vw, -24px);
+      right: clamp(-48px, -3vw, 18px);
       top: 50%;
       width: min(1120px, 84vw);
       aspect-ratio: 1344 / 1195;
       transform: translateY(-50%);
       z-index: 0;
       pointer-events: none;
-      opacity: 0.82;
-      mix-blend-mode: multiply;
+      opacity: 0.88;
+      mix-blend-mode: normal;
     }
 
     .intro-map img,
@@ -85,7 +85,18 @@
 
     .intro-map img {
       object-fit: contain;
-      filter: saturate(1.08) contrast(1.03);
+      filter: saturate(1.02) contrast(0.98) sepia(0.08);
+      opacity: 0.9;
+    }
+
+    .intro-map::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 52% 48%, rgba(248, 239, 217, 0), rgba(248, 239, 217, 0.42) 72%),
+        linear-gradient(90deg, rgba(248, 239, 217, 0.18), rgba(248, 239, 217, 0.08));
+      pointer-events: none;
     }
 
     .intro-route {
@@ -467,17 +478,17 @@
 
       .intro::before {
         background:
-          linear-gradient(180deg, rgba(248, 239, 217, 0.96) 0%, rgba(248, 239, 217, 0.78) 44%, rgba(248, 239, 217, 0.22) 100%),
+          linear-gradient(180deg, rgba(248, 239, 217, 0.94) 0%, rgba(248, 239, 217, 0.72) 44%, rgba(248, 239, 217, 0.2) 100%),
           radial-gradient(circle at 56% 76%, rgba(143, 31, 27, 0.14), transparent 18rem);
       }
 
       .intro-map {
-        right: 50%;
+        right: 46%;
         top: auto;
         bottom: 5vh;
         width: min(760px, 148vw);
         transform: translateX(50%);
-        opacity: 0.7;
+        opacity: 0.78;
       }
 
       .content-panel {
