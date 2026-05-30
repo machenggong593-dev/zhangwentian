@@ -805,7 +805,11 @@
 
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
-    const asset = (path) => CDN_BASE + path.split("/").map(encodeURIComponent).join("/");
+    const ASSET_VERSION = "3fe2587";
+    const asset = (path) => {
+      if (location.protocol === "file:") return path;
+      return `${CDN_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
+    };
 
     const chapters = [
       {
