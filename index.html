@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>张闻天生平经历 H5</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
   <style>
     :root {
       --ink: #2d241d;
@@ -472,7 +474,7 @@
         road: "assets/roads/stone.webp",
         wide: false,
         song: "课堂任务：听得见的历史",
-        copy: "张闻天化身时代见证者，带同学们从上海出发，回顾《送别》《黄河船夫曲》，再走向1948年的东北。",
+        copy: "张闻天化身时代见证者，带同学们从上海南汇出发，回顾《送别》《黄河船夫曲》，再走向1947年的东北。",
         note: "这节课要为“革命足迹音乐地图”打基础：听歌、看地点、找联系。"
       },
       {
@@ -538,17 +540,21 @@
     let isScrolling = false;
     let currentPersonSrc = "";
     let currentRoadSrc = "";
+    const loadedAssets = new Set();
 
     function preload(src) {
+      if (loadedAssets.has(src)) return;
+      loadedAssets.add(src);
       const image = new Image();
       image.src = src;
     }
 
     chapters.forEach((chapter, index) => {
       const img = document.createElement("img");
-      img.src = asset(chapter.scene);
+      img.dataset.src = asset(chapter.scene);
       img.alt = "";
       img.className = "scene-img";
+      img.decoding = "async";
       if (chapter.wide) img.classList.add("is-wide");
       if (chapter.sceneClass) img.classList.add(chapter.sceneClass);
       scenery.appendChild(img);
@@ -564,14 +570,26 @@
       dots.appendChild(dot);
     });
 
-    chapters.forEach((chapter) => {
-      preload(asset(chapter.scene));
-      preload(asset(chapter.road));
-    });
-    Object.values(frames).flat().forEach((frame) => preload(asset(frame)));
-
     const sceneImages = [...document.querySelectorAll(".scene-img")];
     const dotButtons = [...document.querySelectorAll(".dot")];
+    const runWhenIdle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 500));
+
+    function loadChapterAssets(index) {
+      const chapter = chapters[index];
+      if (!chapter) return;
+      const sceneImage = sceneImages[index];
+      if (sceneImage && !sceneImage.src) {
+        sceneImage.src = sceneImage.dataset.src;
+      }
+      preload(asset(chapter.road));
+      frames[chapter.age].forEach((frame) => preload(asset(frame)));
+    }
+
+    function warmNextChapter(index) {
+      runWhenIdle(() => {
+        loadChapterAssets(index + 1);
+      });
+    }
 
     function clamp(value, min, max) {
       return Math.min(max, Math.max(min, value));
@@ -587,6 +605,8 @@
       song.textContent = chapter.song;
       note.textContent = chapter.note;
       chapterLabel.textContent = chapter.label;
+      loadChapterAssets(index);
+      warmNextChapter(index);
       sceneImages.forEach((img, i) => img.classList.toggle("active", i === index));
       dotButtons.forEach((dot, i) => dot.classList.toggle("active", i === index));
     }
