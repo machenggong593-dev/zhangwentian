@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>张闻天生平经历 H5</title>
+  <style>
+    :root {
+      --ink: #2d241d;
+      --muted: #6f5b48;
+      --paper: #fff7e9;
+      --paper-deep: #ead7b9;
+      --red: #8f1f1b;
+      --gold: #c9923f;
+      --green: #58794a;
+      --shadow: 0 18px 42px rgba(45, 36, 29, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(255, 248, 218, 0.8), transparent 34rem),
+        linear-gradient(180deg, #f8efd9 0%, #f4dfbd 46%, #e9cfa4 100%);
+      overflow-x: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .intro {
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      padding: 7vh 7vw 12vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro-inner {
+      width: min(920px, 100%);
+      position: relative;
+      z-index: 1;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--red);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 44px;
+      height: 2px;
+      background: var(--red);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(48px, 11vw, 124px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .intro-copy {
+      margin: 24px 0 0;
+      max-width: 640px;
+      color: #4f4033;
+      font-size: clamp(17px, 2.4vw, 24px);
+      line-height: 1.75;
+    }
+
+    .scroll-cue {
+      margin-top: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .scroll-cue span {
+      width: 22px;
+      height: 38px;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      position: relative;
+    }
+
+    .scroll-cue span::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      width: 4px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      transform: translateX(-50%);
+      animation: wheel 1.5s infinite;
+    }
+
+    @keyframes wheel {
+      0% { opacity: 0; transform: translate(-50%, 0); }
+      35% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, 13px); }
+    }
+
+    .journey {
+      height: 520vh;
+      position: relative;
+    }
+
+    .stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(250, 238, 216, 0.96), rgba(235, 211, 175, 0.9)),
+        #f3dfbd;
+      isolation: isolate;
+    }
+
+    .sky {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 231, 0.8) 0%, rgba(255, 243, 214, 0.46) 40%, rgba(193, 160, 112, 0.18) 100%);
+      z-index: -3;
+    }
+
+    .road-wrap {
+      position: absolute;
+      left: 50%;
+      bottom: -16svh;
+      width: min(980px, 118vw);
+      height: 122svh;
+      transform: translateX(-50%) perspective(900px) rotateX(58deg);
+      transform-origin: bottom center;
+      overflow: hidden;
+      z-index: -1;
+      border-radius: 48% 48% 0 0;
+      box-shadow: inset 0 34px 60px rgba(108, 77, 42, 0.08);
+    }
+
+    .road {
+      position: absolute;
+      inset: -30% 0;
+      background: url("https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/地图素材/路/农家土路.png") center top / cover repeat-y;
+      transform: translateY(var(--road-y, 0));
+      filter: saturate(0.95) contrast(0.96);
+    }
+
+    .scenery {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .scene-img {
+      position: absolute;
+      left: 50%;
+      bottom: 31svh;
+      max-width: min(900px, 96vw);
+      max-height: 46svh;
+      object-fit: contain;
+      opacity: 0;
+      transform: translate(-50%, 24px) scale(0.96);
+      transition: opacity 520ms ease, transform 620ms ease;
+      filter: drop-shadow(0 28px 28px rgba(57, 42, 25, 0.18));
+    }
+
+    .scene-img.is-wide {
+      max-width: min(1480px, 158vw);
+      max-height: 68svh;
+      bottom: 21svh;
+    }
+
+    .scene-img.is-shanghai {
+      max-width: min(1240px, 132vw);
+      max-height: 58svh;
+      bottom: 24svh;
+    }
+
+    .scene-img.active {
+      opacity: 0.96;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .character {
+      position: absolute;
+      left: 50%;
+      bottom: 7svh;
+      width: clamp(92px, 18vw, 176px);
+      transform: translateX(-50%);
+      z-index: 5;
+      filter: drop-shadow(0 16px 12px rgba(43, 31, 20, 0.2));
+    }
+
+    .character img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .content-panel {
+      position: absolute;
+      left: 50%;
+      top: clamp(34px, 7svh, 72px);
+      width: min(880px, calc(100vw - 28px));
+      padding: 11px 14px 10px;
+      background:
+        linear-gradient(135deg, rgba(255, 251, 240, 0.62), rgba(246, 230, 201, 0.52));
+      border: 1px solid rgba(118, 83, 45, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 8px 22px rgba(45, 36, 29, 0.08);
+      backdrop-filter: blur(6px);
+      transform: translateX(-50%);
+      z-index: 8;
+    }
+
+    .year {
+      display: none;
+      color: var(--red);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .panel-title {
+      display: none;
+      margin: 9px 0 0;
+      font-size: clamp(25px, 6vw, 40px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .panel-copy {
+      margin: 0;
+      color: #493a2d;
+      font-size: 14px;
+      line-height: 1.52;
+    }
+
+    .song-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 6px 9px;
+      color: #6c271e;
+      background: rgba(143, 31, 27, 0.08);
+      border: 1px solid rgba(143, 31, 27, 0.16);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .song-tag::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .panel-note {
+      margin: 6px 0 0;
+      padding-top: 6px;
+      border-top: 1px solid rgba(83, 58, 30, 0.16);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .progress {
+      position: absolute;
+      right: clamp(16px, 4vw, 56px);
+      top: 50%;
+      display: grid;
+      gap: 14px;
+      transform: translateY(-50%);
+      z-index: 9;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(79, 64, 51, 0.28);
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+      padding: 0;
+    }
+
+    .dot.active {
+      transform: scale(1.45);
+      background: var(--red);
+    }
+
+    .chapter-label {
+      position: absolute;
+      right: clamp(20px, 5vw, 70px);
+      bottom: clamp(22px, 6vh, 58px);
+      color: rgba(45, 36, 29, 0.36);
+      font-size: clamp(42px, 12vw, 124px);
+      line-height: 1;
+      font-weight: 900;
+      z-index: 1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .timeline {
+      position: absolute;
+      left: 50%;
+      bottom: 3.4svh;
+      width: min(600px, 74vw);
+      height: 3px;
+      background: rgba(81, 59, 36, 0.18);
+      transform: translateX(-50%);
+      border-radius: 999px;
+      z-index: 4;
+    }
+
+    .timeline-fill {
+      width: calc(var(--progress, 0) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+    }
+
+    .end {
+      min-height: 72svh;
+      display: grid;
+      place-items: center;
+      padding: 72px 7vw;
+      background: #2f2a24;
+      color: #f7ead3;
+      text-align: center;
+    }
+
+    .end p {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(21px, 4vw, 36px);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 720px) {
+      .content-panel {
+        top: 34px;
+        padding: 10px 12px;
+      }
+
+      .panel-copy {
+        font-size: 13px;
+      }
+
+      .scene-img {
+        bottom: 32svh;
+        max-height: 34svh;
+        max-width: 118vw;
+      }
+
+      .scene-img.is-wide {
+        bottom: 28svh;
+        max-height: 50svh;
+        max-width: 178vw;
+      }
+
+      .scene-img.is-shanghai {
+        bottom: 30svh;
+        max-height: 44svh;
+        max-width: 148vw;
+      }
+
+      .character {
+        bottom: 7.5svh;
+        width: clamp(92px, 29vw, 132px);
+      }
+
+      .progress {
+        top: auto;
+        right: 18px;
+        bottom: 18px;
+        transform: none;
+        grid-auto-flow: column;
+      }
+
+      .chapter-label {
+        right: 16px;
+        bottom: 12svh;
+      }
+
+      .timeline {
+        bottom: 2svh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="intro" aria-label="开篇">
+      <div class="intro-inner">
+        <p class="kicker">追寻张闻天的时代旋律</p>
+        <h1>声闻于天</h1>
+        <p class="intro-copy">从上海的学堂歌声，到陕北黄河岸边的船歌，再到合江工厂里的劳动号子，沿着张闻天的足迹听见时代的变化。</p>
+        <div class="scroll-cue" aria-hidden="true"><span></span>向下滚动</div>
+      </div>
+    </section>
+
+    <section class="journey" id="journey" aria-label="张闻天生平经历">
+      <div class="stage" id="stage">
+        <div class="sky"></div>
+        <div class="scenery" id="scenery"></div>
+        <div class="road-wrap"><div class="road" id="road"></div></div>
+
+        <article class="content-panel" aria-live="polite">
+          <div class="year" id="year"></div>
+          <h2 class="panel-title" id="title"></h2>
+          <p class="panel-copy" id="copy"></p>
+          <div class="song-tag" id="song"></div>
+          <p class="panel-note" id="note"></p>
+        </article>
+
+        <div class="character" aria-hidden="true">
+          <img id="person" src="https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/动画/少年/图层 1.png" alt="" />
+        </div>
+
+        <nav class="progress" id="dots" aria-label="人生节点导航"></nav>
+        <div class="chapter-label" id="chapterLabel"></div>
+        <div class="timeline" aria-hidden="true"><div class="timeline-fill" id="timelineFill"></div></div>
+      </div>
+    </section>
+
+    <section class="end">
+      <p>借用外来，扎根民间，源于劳动。三首歌连成一条声脉，也照见文艺走向人民的道路。</p>
+    </section>
+  </main>
+
+  <script>
+    const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
+    const asset = (path) => CDN_BASE + path.split("/").map(encodeURIComponent).join("/");
+
+    const chapters = [
+      {
+        year: "",
+        title: "AI导入",
+        label: "导入",
+        age: "少年",
+        scene: "地图素材/路尽头/南汇.png",
+        road: "地图素材/路/石板路.png",
+        wide: false,
+        song: "课堂任务：听得见的历史",
+        copy: "张闻天化身时代见证者，带同学们从上海出发，回顾《送别》《黄河船夫曲》，再走向1948年的东北。",
+        note: "这节课要为“革命足迹音乐地图”打基础：听歌、看地点、找联系。"
+      },
+      {
+        year: "",
+        title: "上海展厅",
+        label: "上海",
+        age: "青年",
+        scene: "地图素材/路尽头/五四.png",
+        road: "地图素材/路/砖路.png",
+        wide: true,
+        sceneClass: "is-shanghai",
+        song: "中西结合，兼收并蓄",
+        copy: "《送别》代表学堂乐歌的启蒙声音。它借用外来曲调，填入中文歌词，在20世纪初开启民智、唤醒国民。张闻天青年时代在上海，就是听着这样的歌声成长的。“借用外来曲调”是那个时代的特征。",
+        note: "音乐关键词：借外来火种，启国民心智。"
+      },
+      {
+        year: "",
+        title: "陕北展厅",
+        label: "陕北",
+        age: "壮年",
+        scene: "地图素材/路尽头/窑洞.png",
+        road: "地图素材/路/农家土路.png",
+        wide: false,
+        song: "根植乡土，魂系家国",
+        copy: "《黄河船夫曲》来自陕北黄河岸边，吸收船工号子，一领众和的呐喊把音乐从书斋带到旷野。到了延安时期，音乐家们开始深入民间，用老百姓最熟悉的旋律唱出革命的信念。张闻天正是延安文艺座谈会的推动者之一。",
+        note: "音乐关键词：用民间旋律，唱革命信念。"
+      },
+      {
+        year: "",
+        title: "合江展厅",
+        label: "合江",
+        age: "中年",
+        scene: "地图素材/路尽头/工厂.png",
+        road: "地图素材/路/水泥路.png",
+        wide: true,
+        song: "讴歌劳动，质朴铿锵",
+        copy: "1947年，马可来到合江省会佳木斯，深入工厂体验生活，用东北秧歌调和劳动号子写出工人的歌。当时合江根据地的领导人正是张闻天。他亲自鼓励马可到工人中间去，说“艺术要从生活中来”。正是在他的推动下，东北新文化运动蓬勃发展，《咱们工人有力量》才有了诞生的土壤。",
+        note: "音乐关键词：从汗水里长出工人的歌。"
+      }
+    ];
+
+    const frames = {
+      "少年": ["动画/少年/图层 1.png", "动画/少年/图层 2.png", "动画/少年/图层 3.png"],
+      "青年": ["动画/青年/图层 1.png", "动画/青年/图层 2.png", "动画/青年/图层 3.png"],
+      "壮年": ["动画/壮年/图层 1.png", "动画/壮年/图层 2.png", "动画/壮年/图层 3.png"],
+      "中年": ["动画/中年/图层 1.png", "动画/中年/图层 2.png", "动画/中年/图层 3.png"]
+    };
+
+    const journey = document.getElementById("journey");
+    const road = document.getElementById("road");
+    const person = document.getElementById("person");
+    const scenery = document.getElementById("scenery");
+    const dots = document.getElementById("dots");
+    const year = document.getElementById("year");
+    const title = document.getElementById("title");
+    const copy = document.getElementById("copy");
+    const song = document.getElementById("song");
+    const note = document.getElementById("note");
+    const chapterLabel = document.getElementById("chapterLabel");
+    const timelineFill = document.getElementById("timelineFill");
+    let activeIndex = -1;
+    let scrollStopTimer = 0;
+    let isScrolling = false;
+
+    chapters.forEach((chapter, index) => {
+      const img = document.createElement("img");
+      img.src = asset(chapter.scene);
+      img.alt = "";
+      img.className = "scene-img";
+      if (chapter.wide) img.classList.add("is-wide");
+      if (chapter.sceneClass) img.classList.add(chapter.sceneClass);
+      scenery.appendChild(img);
+
+      const dot = document.createElement("button");
+      dot.className = "dot";
+      dot.type = "button";
+      dot.setAttribute("aria-label", chapter.title);
+      dot.addEventListener("click", () => {
+        const top = journey.offsetTop + (journey.offsetHeight - window.innerHeight) * (index / (chapters.length - 1));
+        window.scrollTo({ top, behavior: "smooth" });
+      });
+      dots.appendChild(dot);
+    });
+
+    const sceneImages = [...document.querySelectorAll(".scene-img")];
+    const dotButtons = [...document.querySelectorAll(".dot")];
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function setChapter(index) {
+      if (index === activeIndex) return;
+      activeIndex = index;
+      const chapter = chapters[index];
+      year.textContent = chapter.year;
+      title.textContent = chapter.title;
+      copy.textContent = chapter.copy;
+      song.textContent = chapter.song;
+      note.textContent = chapter.note;
+      chapterLabel.textContent = chapter.label;
+      sceneImages.forEach((img, i) => img.classList.toggle("active", i === index));
+      dotButtons.forEach((dot, i) => dot.classList.toggle("active", i === index));
+    }
+
+    function update() {
+      const start = journey.offsetTop;
+      const distance = journey.offsetHeight - window.innerHeight;
+      const progress = clamp((window.scrollY - start) / distance, 0, 1);
+      const chapterProgress = progress * (chapters.length - 1);
+      const index = clamp(Math.round(chapterProgress), 0, chapters.length - 1);
+      const chapter = chapters[index];
+      const frameSet = frames[chapter.age];
+      const frameIndex = isScrolling ? Math.floor(progress * 48) % frameSet.length : 0;
+
+      setChapter(index);
+      person.src = asset(frameSet[frameIndex]);
+      road.style.backgroundImage = `url("${asset(chapter.road)}")`;
+      road.style.setProperty("--road-y", `${-progress * 42}%`);
+      timelineFill.style.setProperty("--progress", progress);
+    }
+
+    window.addEventListener("scroll", () => {
+      isScrolling = true;
+      window.clearTimeout(scrollStopTimer);
+      scrollStopTimer = window.setTimeout(() => {
+        isScrolling = false;
+        update();
+      }, 120);
+      update();
+    }, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  </script>
+</body>
+</html>
