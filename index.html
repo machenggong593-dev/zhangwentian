@@ -804,7 +804,7 @@
   </main>
 
   <script>
-    const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
+    const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
     const ASSET_VERSION = "perf-v1";
     const asset = (path) => {
       if (location.protocol === "file:") return path;
@@ -910,13 +910,25 @@
     let isScrolling = false;
     let currentPersonSrc = "";
     let currentRoadSrc = "";
+    let ticking = false;
     const loadedAssets = new Set();
 
     function preload(src) {
       if (loadedAssets.has(src)) return;
       loadedAssets.add(src);
       const image = new Image();
+      image.decoding = "async";
       image.src = src;
+    }
+
+    function resolveChapterAssets(index) {
+      const chapter = chapters[index];
+      if (!chapter) return [];
+      return [
+        chapter.scene,
+        chapter.road,
+        ...frames[chapter.age]
+      ].map(asset);
     }
 
     chapters.forEach((chapter) => {
@@ -1019,14 +1031,24 @@
       if (sceneImage && !sceneImage.src) {
         sceneImage.src = sceneImage.dataset.src;
       }
-      preload(asset(chapter.road));
-      frames[chapter.age].forEach((frame) => preload(asset(frame)));
+      resolveChapterAssets(index).forEach(preload);
     }
 
     function warmNextChapter(index) {
       runWhenIdle(() => {
+        loadChapterAssets(index - 1);
         loadChapterAssets(index + 1);
       });
+    }
+
+    function warmAllChapters() {
+      let index = 0;
+      const warm = () => {
+        loadChapterAssets(index);
+        index += 1;
+        if (index < chapters.length) runWhenIdle(warm);
+      };
+      runWhenIdle(warm);
     }
 
     function clamp(value, min, max) {
@@ -1092,16 +1114,25 @@
       timelineFill.style.setProperty("--progress", progress);
     }
 
+    function requestUpdate() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        update();
+      });
+    }
+
     window.addEventListener("scroll", () => {
       isScrolling = true;
       window.clearTimeout(scrollStopTimer);
       scrollStopTimer = window.setTimeout(() => {
         isScrolling = false;
-        update();
+        requestUpdate();
       }, 120);
-      update();
+      requestUpdate();
     }, { passive: true });
-    window.addEventListener("resize", update);
+    window.addEventListener("resize", requestUpdate);
     function replayIntroRoute() {
       introMap.classList.remove("is-playing");
       void introMap.offsetWidth;
@@ -1119,6 +1150,7 @@
     introObserver.observe(intro);
     replayIntroRoute();
     update();
+    warmAllChapters();
   </script>
 </body>
 </html>
