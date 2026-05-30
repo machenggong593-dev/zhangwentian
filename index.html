@@ -254,9 +254,9 @@
     .road-wrap {
       position: absolute;
       left: 50%;
-      bottom: -16svh;
+      bottom: -10svh;
       width: min(980px, 118vw);
-      height: 122svh;
+      height: 150svh;
       transform: translateX(-50%) perspective(900px) rotateX(58deg);
       transform-origin: bottom center;
       overflow: hidden;
@@ -267,8 +267,11 @@
 
     .road {
       position: absolute;
-      inset: -30% 0;
-      background: url("https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/assets/roads/dirt.webp") center top / cover repeat-y;
+      inset: -105% 0;
+      background-image: url("https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/assets/roads/dirt.webp");
+      background-position: center top;
+      background-size: var(--road-size, cover);
+      background-repeat: var(--road-repeat, repeat-y);
       transform: translateY(var(--road-y, 0));
       filter: saturate(0.95) contrast(0.96);
     }
@@ -319,7 +322,7 @@
     .character {
       position: absolute;
       left: 50%;
-      bottom: 7svh;
+      bottom: 10svh;
       width: clamp(92px, 18vw, 176px);
       transform: translateX(-50%);
       z-index: 5;
@@ -404,7 +407,7 @@
     .progress {
       position: absolute;
       right: clamp(16px, 4vw, 56px);
-      top: 50%;
+      top: 46%;
       display: grid;
       gap: 14px;
       transform: translateY(-50%);
@@ -443,20 +446,28 @@
     .timeline {
       position: absolute;
       left: 50%;
-      bottom: 3.4svh;
-      width: min(600px, 74vw);
-      height: 3px;
-      background: rgba(81, 59, 36, 0.18);
+      bottom: 1.6svh;
+      width: min(498px, 74vw);
+      height: 9px;
+      background: url("assets/progress/timeline-empty.png") center / 100% 100% no-repeat;
       transform: translateX(-50%);
       border-radius: 999px;
       z-index: 4;
+      overflow: hidden;
     }
 
     .timeline-fill {
       width: calc(var(--progress, 0) * 100%);
       height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+      overflow: hidden;
+    }
+
+    .timeline-fill::before {
+      content: "";
+      display: block;
+      width: min(498px, 74vw);
+      height: 100%;
+      background: url("assets/progress/timeline-complete.png") left center / 100% 100% no-repeat;
     }
 
     .end {
@@ -685,14 +696,14 @@
       }
 
       .character {
-        bottom: 7.5svh;
+        bottom: 10.5svh;
         width: clamp(92px, 29vw, 132px);
       }
 
       .progress {
         top: auto;
         right: 18px;
-        bottom: 18px;
+        bottom: 34px;
         transform: none;
         grid-auto-flow: column;
       }
@@ -703,7 +714,7 @@
       }
 
       .timeline {
-        bottom: 2svh;
+        bottom: 1svh;
       }
 
       .ai-lab {
@@ -904,7 +915,7 @@
       image.src = src;
     }
 
-    chapters.forEach((chapter, index) => {
+    chapters.forEach((chapter) => {
       const img = document.createElement("img");
       img.dataset.src = asset(chapter.scene);
       img.alt = "";
@@ -913,13 +924,23 @@
       if (chapter.wide) img.classList.add("is-wide");
       if (chapter.sceneClass) img.classList.add(chapter.sceneClass);
       scenery.appendChild(img);
+    });
 
+    const progressStops = [
+      { chapterIndex: 0 },
+      { chapterIndex: 1 },
+      { chapterIndex: 3 },
+      { chapterIndex: 4 }
+    ];
+
+    progressStops.forEach((stop) => {
+      const chapter = chapters[stop.chapterIndex];
       const dot = document.createElement("button");
       dot.className = "dot";
       dot.type = "button";
       dot.setAttribute("aria-label", chapter.title);
       dot.addEventListener("click", () => {
-        const top = journey.offsetTop + (journey.offsetHeight - window.innerHeight) * (index / (chapters.length - 1));
+        const top = journey.offsetTop + (journey.offsetHeight - window.innerHeight) * (stop.chapterIndex / (chapters.length - 1));
         window.scrollTo({ top, behavior: "smooth" });
       });
       dots.appendChild(dot);
@@ -1008,6 +1029,13 @@
       return Math.min(max, Math.max(min, value));
     }
 
+    function getProgressDotIndex(chapterIndex) {
+      if (chapterIndex <= 0) return 0;
+      if (chapterIndex <= 2) return 1;
+      if (chapterIndex === 3) return 2;
+      return 3;
+    }
+
     function setChapter(index) {
       if (index === activeIndex) return;
       activeIndex = index;
@@ -1021,7 +1049,8 @@
       loadChapterAssets(index);
       warmNextChapter(index);
       sceneImages.forEach((img, i) => img.classList.toggle("active", i === index));
-      dotButtons.forEach((dot, i) => dot.classList.toggle("active", i === index));
+      const activeDotIndex = getProgressDotIndex(index);
+      dotButtons.forEach((dot, i) => dot.classList.toggle("active", i === activeDotIndex));
     }
 
     function update() {
@@ -1044,6 +1073,16 @@
       if (nextRoadSrc !== currentRoadSrc) {
         currentRoadSrc = nextRoadSrc;
         road.style.backgroundImage = `url("${nextRoadSrc}")`;
+      }
+      if (chapter.road.includes("stone")) {
+        road.style.setProperty("--road-size", "clamp(300px, 44vw, 460px) auto");
+        road.style.setProperty("--road-repeat", "repeat");
+      } else if (chapter.road.includes("brick")) {
+        road.style.setProperty("--road-size", "clamp(240px, 36vw, 380px) auto");
+        road.style.setProperty("--road-repeat", "repeat");
+      } else {
+        road.style.setProperty("--road-size", "cover");
+        road.style.setProperty("--road-repeat", "repeat-y");
       }
       road.style.setProperty("--road-y", `${-progress * 42}%`);
       timelineFill.style.setProperty("--progress", progress);
