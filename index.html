@@ -846,7 +846,7 @@
 
     .prompt-box {
       width: 100%;
-      min-height: 142px;
+      min-height: 180px;
       resize: vertical;
       border: 1px solid rgba(247, 234, 211, 0.22);
       border-radius: 8px;
@@ -1138,7 +1138,7 @@
 
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
-    const ASSET_VERSION = "multi-material-shelf-v1";
+    const ASSET_VERSION = "six-storyboard-prompts-v1";
     const RAW_MATERIAL_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
     const asset = (path) => {
       if (location.protocol === "file:") return path;
@@ -1236,11 +1236,14 @@
       {
         key: "storyboards",
         label: "分镜头示例",
-        note: "分镜头示例来自动画/分镜头文件夹，下载格式为PNG。",
+        note: "分镜头示例来自动画/分镜头文件夹，1和2对应上海，3和4对应陕北，5和6对应合江，下载格式为PNG。",
         items: [
-          { type: "image", label: "分镜头 1", src: "动画/分镜头/1.png", filename: "分镜头-1.png", cardClass: "is-storyboard" },
-          { type: "image", label: "分镜头 2", src: "动画/分镜头/2.png", filename: "分镜头-2.png", cardClass: "is-storyboard" },
-          { type: "image", label: "分镜头 3", src: "动画/分镜头/3.png", filename: "分镜头-3.png", cardClass: "is-storyboard" }
+          { type: "image", label: "上海分镜头 1", src: "动画/分镜头/1.png", filename: "上海分镜头-1.png", cardClass: "is-storyboard" },
+          { type: "image", label: "上海分镜头 2", src: "动画/分镜头/2.png", filename: "上海分镜头-2.png", cardClass: "is-storyboard" },
+          { type: "image", label: "陕北分镜头 1", src: "动画/分镜头/3.png", filename: "陕北分镜头-1.png", cardClass: "is-storyboard" },
+          { type: "image", label: "陕北分镜头 2", src: "动画/分镜头/4.png", filename: "陕北分镜头-2.png", cardClass: "is-storyboard" },
+          { type: "image", label: "合江分镜头 1", src: "动画/分镜头/5.png", filename: "合江分镜头-1.png", cardClass: "is-storyboard" },
+          { type: "image", label: "合江分镜头 2", src: "动画/分镜头/6.png", filename: "合江分镜头-2.png", cardClass: "is-storyboard" }
         ]
       },
       {
@@ -1254,23 +1257,41 @@
     ];
 
     const videoPrompts = {
-      shanghai: {
-        label: "上海",
-        title: "上海视频播放页",
-        intro: "上海展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
-        text: "20世纪初上海新式学堂场景，青年学生在教室中唱歌，窗外有五四时期的城市氛围。画面表现学堂乐歌《送别》的启蒙气质，中西结合、兼收并蓄，张闻天青年时代在这样的歌声中成长。复古插画风，镜头缓慢推进，无字幕。"
+      shanghai1: {
+        label: "上海1",
+        title: "上海分镜头1",
+        intro: "分镜头1对应上海学堂歌声。复制提示词到即梦生成5秒卡通风视频。",
+        text: "20世纪初上海新式学堂室内，青年学生整齐坐在木质课桌前轻声学唱《送别》，窗外有柔和阳光和老上海建筑剪影，画面温暖、抒情、典雅。主角为青年张闻天形象，站在学生中间认真聆听，表现学堂乐歌开启民智的氛围。镜头从窗边缓慢推进到教室中央，复古手绘卡通风，色彩柔和，无字幕，无文字。"
       },
-      yanan: {
-        label: "陕北",
-        title: "陕北视频播放页",
-        intro: "陕北展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
-        text: "1940年代陕北黄河岸边，船工在黄河上拉纤、划船，众人配合呼喊号子。风沙、河浪、黄土高坡，表现《黄河船夫曲》的粗犷豪迈，根植乡土、魂系家国。音乐家深入民间，用人民熟悉的旋律唱出革命信念，无字幕。"
+      shanghai2: {
+        label: "上海2",
+        title: "上海分镜头2",
+        intro: "分镜头2对应上海启蒙与远望。复制提示词到即梦生成5秒卡通风视频。",
+        text: "20世纪初上海街头与学堂外景，青年张闻天走出新式学堂，手中拿着书本，身后隐约传来《送别》的学堂歌声。远处有学生、书报、街巷和近代城市建筑，表现中西结合、兼收并蓄、青年思想被启蒙的感觉。镜头轻微横移，人物缓慢向前走，复古插画卡通风，温暖怀旧色调，无字幕，无文字。"
       },
-      hejiang: {
-        label: "合江",
-        title: "合江视频播放页",
-        intro: "合江展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
-        text: "1940年代东北合江佳木斯工厂，工人们在车间中集体劳动，机器运转，火花和蒸汽。表现《咱们工人有力量》的劳动号子气质，讴歌劳动、质朴铿锵。张闻天鼓励文艺工作者到工人中间去，艺术从生活中来，复古宣传画风，无字幕。"
+      yanan1: {
+        label: "陕北1",
+        title: "陕北分镜头1",
+        intro: "分镜头3对应陕北黄河岸边。复制提示词到即梦生成5秒卡通风视频。",
+        text: "1940年代陕北黄河岸边，黄土高坡、河水翻涌，船工们在河边拉纤、划船，动作有力量，形成一领众和的劳动节奏。壮年张闻天站在岸边眺望黄河，感受民间号子的粗犷力量。画面表现《黄河船夫曲》的紧张、激烈、搏斗感。镜头从黄河水面缓慢拉向船工队伍，复古革命题材卡通风，无字幕，无文字。"
+      },
+      yanan2: {
+        label: "陕北2",
+        title: "陕北分镜头2",
+        intro: "分镜头4对应民间旋律化作信念。复制提示词到即梦生成5秒卡通风视频。",
+        text: "延安时期陕北窑洞前，音乐工作者和群众围坐交流，远处黄河与黄土高坡相连，几名船工做出呼号动作，节奏感强。壮年张闻天与群众站在一起，神情坚定，表现音乐家深入民间、从船工号子中吸收养分，用人民熟悉的旋律唱出革命信念。镜头缓慢环绕人物，画面粗犷有力，复古卡通风，无字幕，无文字。"
+      },
+      hejiang1: {
+        label: "合江1",
+        title: "合江分镜头1",
+        intro: "分镜头5对应工厂里的劳动号子。复制提示词到即梦生成5秒卡通风视频。",
+        text: "1940年代东北合江佳木斯工厂车间，机器运转，蒸汽升腾，工人们集体劳动，动作整齐有力，在重拍处挥臂呼喊嘿呦的感觉。中年张闻天站在车间旁，鼓励文艺工作者走到工人中间去。画面表现《咱们工人有力量》的坚实、有力、整齐。镜头从机器零件缓慢推向集体劳动的工人，复古宣传画卡通风，无字幕，无文字。"
+      },
+      hejiang2: {
+        label: "合江2",
+        title: "合江分镜头2",
+        intro: "分镜头6对应从汗水里长出的歌。复制提示词到即梦生成5秒卡通风视频。",
+        text: "东北合江工厂外或车间广场，工人们结束劳动后围在一起高唱《咱们工人有力量》，神情振奋，队伍整齐，背景有厂房、烟囱、红色旗帜和温暖夕光。中年张闻天与工人站在同一画面中，表现艺术来源于人民生活和劳动，从汗水里长出工人的歌。镜头由近景工人挥臂转为全景队伍，积极昂扬，复古卡通风，无字幕，无文字。"
       }
     };
 
@@ -1747,7 +1768,14 @@
 
     introObserver.observe(intro);
 
-    const promptList = [videoPrompts.shanghai, videoPrompts.yanan, videoPrompts.hejiang];
+    const promptList = [
+      videoPrompts.shanghai1,
+      videoPrompts.shanghai2,
+      videoPrompts.yanan1,
+      videoPrompts.yanan2,
+      videoPrompts.hejiang1,
+      videoPrompts.hejiang2
+    ];
 
     function setPrompt(index) {
       const prompt = promptList[index];
