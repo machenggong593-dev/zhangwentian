@@ -37,7 +37,8 @@
       overflow-x: hidden;
     }
 
-    button {
+    button,
+    textarea {
       font: inherit;
     }
 
@@ -228,8 +229,16 @@
     }
 
     .journey {
-      height: 520vh;
       position: relative;
+      background:
+        linear-gradient(180deg, rgba(250, 238, 216, 0.92), rgba(235, 211, 175, 0.94)),
+        #f3dfbd;
+    }
+
+    .story-page {
+      position: relative;
+      height: 140svh;
+      min-height: 780px;
     }
 
     .stage {
@@ -241,6 +250,12 @@
         linear-gradient(180deg, rgba(250, 238, 216, 0.96), rgba(235, 211, 175, 0.9)),
         #f3dfbd;
       isolation: isolate;
+    }
+
+    .story-page + .story-page .stage,
+    .story-page + .video-section,
+    .video-section + .story-page .stage {
+      border-top: 1px solid rgba(118, 83, 45, 0.12);
     }
 
     .sky {
@@ -314,9 +329,15 @@
       bottom: 21svh;
     }
 
-    .scene-img.active {
+    .story-page.is-active .scene-img.active,
+    .story-page.is-seen .scene-img.active {
       opacity: 0.96;
       transform: translate(-50%, 0) scale(1);
+    }
+
+    .story-page.is-long {
+      height: 190svh;
+      min-height: 1040px;
     }
 
     .character {
@@ -351,19 +372,27 @@
       z-index: 8;
     }
 
-    .year {
-      display: none;
+    .page-mini-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 7px;
       color: var(--red);
-      font-size: 20px;
+      font-size: 13px;
       font-weight: 800;
+      letter-spacing: 0.08em;
     }
 
+    .page-mini-title::before {
+      content: "";
+      width: 24px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    .year,
     .panel-title {
       display: none;
-      margin: 9px 0 0;
-      font-size: clamp(25px, 6vw, 40px);
-      line-height: 1.08;
-      letter-spacing: 0;
     }
 
     .panel-copy {
@@ -470,32 +499,124 @@
       background: url("assets/progress/timeline-complete.png") left center / 100% 100% no-repeat;
     }
 
+
+
+    /* 全局固定进度条：不再依赖单个页面内部的 timeline */
+    .story-page .timeline {
+      display: none !important;
+    }
+
+    #fixedTimeline {
+      position: fixed !important;
+      left: 50%;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      width: min(560px, 78vw);
+      height: 10px;
+      background: url("assets/progress/timeline-empty.png") center / 100% 100% no-repeat;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      z-index: 9999;
+      overflow: hidden;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 12px rgba(45, 36, 29, 0.26));
+    }
+
+    #fixedTimelineFill {
+      width: calc(var(--global-progress, 0) * 100%);
+      height: 100%;
+      overflow: hidden;
+      transition: width 80ms linear;
+    }
+
+    #fixedTimelineFill::before {
+      content: "";
+      display: block;
+      width: min(560px, 78vw);
+      height: 100%;
+      background: url("assets/progress/timeline-complete.png") left center / 100% 100% no-repeat;
+    }
+
+    #fixedProgressDots {
+      position: fixed !important;
+      right: clamp(14px, 3.5vw, 52px);
+      top: 50%;
+      display: grid;
+      gap: 14px;
+      transform: translateY(-50%);
+      z-index: 9999;
+    }
+
+    #fixedProgressDots .dot {
+      box-shadow: 0 4px 12px rgba(45, 36, 29, 0.16);
+    }
+
+
+    /* 不显示每个页面内部的局部侧边点；保留全局固定侧边点与页面小标题 */
+    .progress {
+      display: none !important;
+    }
+
+    .next-page-cue {
+      position: absolute;
+      left: 50%;
+      bottom: 5.2svh;
+      transform: translateX(-50%);
+      z-index: 9;
+      padding: 6px 10px;
+      color: rgba(79, 64, 51, 0.72);
+      font-size: 12px;
+      background: rgba(255, 248, 232, 0.42);
+      border: 1px solid rgba(118, 83, 45, 0.12);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .video-section,
     .end {
       min-height: 100svh;
       display: grid;
       align-items: center;
       padding: 72px 7vw;
-      background: #2f2a24;
+      background:
+        radial-gradient(circle at 16% 18%, rgba(143, 31, 27, 0.28), transparent 31rem),
+        #2f2a24;
       color: #f7ead3;
     }
 
-    .end p {
-      margin: 0;
-      max-width: 720px;
-      font-size: clamp(21px, 4vw, 36px);
-      line-height: 1.65;
-    }
-
+    .video-inner,
     .end-inner {
       width: min(1080px, 100%);
       margin: 0 auto;
       display: grid;
-      gap: 30px;
+      gap: 24px;
+    }
+
+    .video-heading {
+      display: grid;
+      gap: 8px;
+      text-align: center;
+      justify-items: center;
+    }
+
+    .video-heading h2 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 64px);
+      line-height: 1.1;
+    }
+
+    .video-heading p,
+    .end p {
+      margin: 0;
+      max-width: 760px;
+      color: rgba(247, 234, 211, 0.82);
+      font-size: clamp(17px, 2.4vw, 22px);
+      line-height: 1.7;
     }
 
     .end-copy {
       text-align: center;
       justify-self: center;
+      font-size: clamp(21px, 4vw, 36px) !important;
     }
 
     .ai-lab {
@@ -503,6 +624,22 @@
       grid-template-columns: minmax(0, 1fr) minmax(280px, 0.76fr);
       gap: 18px;
       align-items: stretch;
+    }
+
+    .end-ai-lab {
+      width: min(780px, 100%);
+      margin: 0 auto;
+      grid-template-columns: 1fr;
+    }
+
+    .classin-note {
+      margin: 14px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(247, 234, 211, 0.18);
+      color: rgba(247, 234, 211, 0.86);
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
     }
 
     .ai-tool,
@@ -662,6 +799,16 @@
         opacity: 0.78;
       }
 
+      .story-page {
+        height: 138svh;
+        min-height: 760px;
+      }
+
+      .story-page.is-long {
+        height: 178svh;
+        min-height: 960px;
+      }
+
       .content-panel {
         top: 34px;
         padding: 10px 12px;
@@ -717,6 +864,30 @@
         bottom: 1svh;
       }
 
+
+
+      #fixedTimeline {
+        bottom: max(10px, env(safe-area-inset-bottom));
+        width: min(520px, 82vw);
+      }
+
+      #fixedTimelineFill::before {
+        width: min(520px, 82vw);
+      }
+
+      #fixedProgressDots {
+        top: auto;
+        right: 50%;
+        bottom: max(26px, calc(env(safe-area-inset-bottom) + 24px));
+        grid-auto-flow: column;
+        transform: translateX(50%);
+        gap: 11px;
+      }
+
+      .next-page-cue {
+        bottom: 6.4svh;
+      }
+
       .ai-lab {
         grid-template-columns: 1fr;
       }
@@ -748,34 +919,12 @@
       </div>
     </section>
 
-    <section class="journey" id="journey" aria-label="张闻天生平经历">
-      <div class="stage" id="stage">
-        <div class="sky"></div>
-        <div class="scenery" id="scenery"></div>
-        <div class="road-wrap"><div class="road" id="road"></div></div>
-
-        <article class="content-panel" aria-live="polite">
-          <div class="year" id="year"></div>
-          <h2 class="panel-title" id="title"></h2>
-          <p class="panel-copy" id="copy"></p>
-          <div class="song-tag" id="song"></div>
-          <p class="panel-note" id="note"></p>
-        </article>
-
-        <div class="character" aria-hidden="true">
-          <img id="person" src="assets/characters/child-1.webp" alt="" decoding="async" />
-        </div>
-
-        <nav class="progress" id="dots" aria-label="人生节点导航"></nav>
-        <div class="chapter-label" id="chapterLabel"></div>
-        <div class="timeline" aria-hidden="true"><div class="timeline-fill" id="timelineFill"></div></div>
-      </div>
-    </section>
+    <section class="journey" id="journey" aria-label="张闻天生平经历"></section>
 
     <section class="end">
       <div class="end-inner">
         <p class="end-copy">借用外来，扎根民间，源于劳动。三首歌连成一条声脉，也照见文艺走向人民的道路。</p>
-        <div class="ai-lab" aria-label="AI视频共创">
+        <div class="ai-lab end-ai-lab" aria-label="AI视频共创">
           <div class="ai-tool">
             <h2>AI视频共创</h2>
             <div class="prompt-tabs" id="promptTabs" aria-label="选择视频场景"></div>
@@ -785,27 +934,22 @@
               <a class="ai-action" href="https://jimeng.jianying.com/" target="_blank" rel="noopener noreferrer">去即梦生成</a>
               <span class="copy-state" id="copyState"></span>
             </div>
-          </div>
-          <div class="video-drop">
-            <h2>播放生成视频</h2>
-            <div class="video-frame" id="videoFrame">
-              <video id="userVideo" controls playsinline></video>
-              <div class="video-placeholder">上传即梦生成的视频后，在这里播放。</div>
-            </div>
-            <div class="upload-row">
-              <label class="upload-button" for="videoUpload">上传视频</label>
-              <input class="video-input" id="videoUpload" type="file" accept="video/mp4,video/webm,video/quicktime,video/*">
-              <span class="upload-state" id="uploadState"></span>
-            </div>
+            <p class="classin-note">生成后将视频在classin班级作业中提交</p>
           </div>
         </div>
       </div>
     </section>
   </main>
 
+    <div id="fixedTimeline" aria-hidden="true">
+      <div id="fixedTimelineFill"></div>
+    </div>
+    <nav id="fixedProgressDots" aria-label="全局章节导航"></nav>
+
+
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
-    const ASSET_VERSION = "perf-v1";
+    const ASSET_VERSION = "ai-video-only-v1";
     const asset = (path) => {
       if (location.protocol === "file:") return path;
       return `${CDN_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
@@ -814,7 +958,7 @@
     const chapters = [
       {
         year: "",
-        title: "AI导入",
+        title: "导入",
         label: "导入",
         age: "少年",
         scene: "assets/scenes/nanhui.webp",
@@ -822,7 +966,7 @@
         wide: false,
         song: "课堂任务：听得见的历史",
         copy: "张闻天化身时代见证者，带同学们从上海南汇出发，回顾《送别》《黄河船夫曲》，再走向1947年的东北。",
-        note: "这节课要为“革命足迹音乐地图”打基础：听歌、看地点、找联系。"
+        note: "跟着张闻天的足迹寻找声脉地图。"
       },
       {
         year: "",
@@ -830,22 +974,22 @@
         label: "上海",
         age: "青年",
         scene: "assets/scenes/wusi.webp",
+        scenes: [
+          {
+            src: "assets/scenes/wusi.webp",
+            wide: true,
+            sceneClass: "is-shanghai"
+          },
+          {
+            src: "assets/scenes/yida.webp",
+            wide: true,
+            sceneClass: "is-yida"
+          }
+        ],
         road: "assets/roads/brick-v2.webp",
         wide: true,
         sceneClass: "is-shanghai",
-        song: "中西结合，兼收并蓄",
-        copy: "《送别》代表学堂乐歌的启蒙声音。它借用外来曲调，填入中文歌词，在20世纪初开启民智、唤醒国民。张闻天青年时代在上海，就是听着这样的歌声成长的。“借用外来曲调”是那个时代的特征。",
-        note: "音乐关键词：借外来火种，启国民心智。"
-      },
-      {
-        year: "",
-        title: "上海展厅",
-        label: "上海",
-        age: "青年",
-        scene: "assets/scenes/yida.webp",
-        road: "assets/roads/brick-v2.webp",
-        wide: true,
-        sceneClass: "is-yida",
+        longPage: true,
         song: "中西结合，兼收并蓄",
         copy: "《送别》代表学堂乐歌的启蒙声音。它借用外来曲调，填入中文歌词，在20世纪初开启民智、唤醒国民。张闻天青年时代在上海，就是听着这样的歌声成长的。“借用外来曲调”是那个时代的特征。",
         note: "音乐关键词：借外来火种，启国民心智。"
@@ -883,35 +1027,49 @@
       "中年": ["assets/characters/middle-1.webp", "assets/characters/middle-2.webp", "assets/characters/middle-3.webp"]
     };
 
+    const videoPrompts = {
+      shanghai: {
+        label: "上海",
+        title: "上海视频播放页",
+        intro: "上海展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
+        text: "20世纪初上海新式学堂场景，青年学生在教室中唱歌，窗外有五四时期的城市氛围。画面表现学堂乐歌《送别》的启蒙气质，中西结合、兼收并蓄，张闻天青年时代在这样的歌声中成长。复古插画风，镜头缓慢推进，无字幕。"
+      },
+      yanan: {
+        label: "陕北",
+        title: "陕北视频播放页",
+        intro: "陕北展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
+        text: "1940年代陕北黄河岸边，船工在黄河上拉纤、划船，众人配合呼喊号子。风沙、河浪、黄土高坡，表现《黄河船夫曲》的粗犷豪迈，根植乡土、魂系家国。音乐家深入民间，用人民熟悉的旋律唱出革命信念，无字幕。"
+      },
+      hejiang: {
+        label: "合江",
+        title: "合江视频播放页",
+        intro: "合江展厅后方的独立视频页。复制提示词到即梦生成后，可以直接上传视频预览。",
+        text: "1940年代东北合江佳木斯工厂，工人们在车间中集体劳动，机器运转，火花和蒸汽。表现《咱们工人有力量》的劳动号子气质，讴歌劳动、质朴铿锵。张闻天鼓励文艺工作者到工人中间去，艺术从生活中来，复古宣传画风，无字幕。"
+      }
+    };
+
+    const progressStops = [
+      { chapterIndex: 0, label: "导入" },
+      { chapterIndex: 1, label: "上海" },
+      { chapterIndex: 2, label: "陕北" },
+      { chapterIndex: 3, label: "合江" }
+    ];
+
     const journey = document.getElementById("journey");
-    const road = document.getElementById("road");
-    const person = document.getElementById("person");
-    const scenery = document.getElementById("scenery");
-    const dots = document.getElementById("dots");
-    const year = document.getElementById("year");
-    const title = document.getElementById("title");
-    const copy = document.getElementById("copy");
-    const song = document.getElementById("song");
-    const note = document.getElementById("note");
-    const chapterLabel = document.getElementById("chapterLabel");
-    const timelineFill = document.getElementById("timelineFill");
     const intro = document.querySelector(".intro");
     const introMap = document.querySelector(".intro-map");
     const promptTabs = document.getElementById("promptTabs");
     const promptBox = document.getElementById("promptBox");
     const copyPrompt = document.getElementById("copyPrompt");
     const copyState = document.getElementById("copyState");
-    const videoUpload = document.getElementById("videoUpload");
-    const userVideo = document.getElementById("userVideo");
-    const videoFrame = document.getElementById("videoFrame");
-    const uploadState = document.getElementById("uploadState");
-    let activeIndex = -1;
-    let scrollStopTimer = 0;
+    const fixedTimelineFill = document.getElementById("fixedTimelineFill");
+    const fixedProgressDots = document.getElementById("fixedProgressDots");
+
     let isScrolling = false;
-    let currentPersonSrc = "";
-    let currentRoadSrc = "";
+    let scrollStopTimer = 0;
     let ticking = false;
     const loadedAssets = new Set();
+    const pageStates = [];
 
     function preload(src) {
       if (loadedAssets.has(src)) return;
@@ -924,124 +1082,165 @@
     function resolveChapterAssets(index) {
       const chapter = chapters[index];
       if (!chapter) return [];
-      return [
-        chapter.scene,
-        chapter.road,
-        ...frames[chapter.age]
-      ].map(asset);
+      const scenePaths = chapter.scenes ? chapter.scenes.map((scene) => scene.src) : [chapter.scene];
+      return [...scenePaths, chapter.road, ...frames[chapter.age]].map(asset);
     }
 
-    chapters.forEach((chapter) => {
-      const img = document.createElement("img");
-      img.dataset.src = asset(chapter.scene);
-      img.alt = "";
-      img.className = "scene-img";
-      img.decoding = "async";
-      if (chapter.wide) img.classList.add("is-wide");
-      if (chapter.sceneClass) img.classList.add(chapter.sceneClass);
-      scenery.appendChild(img);
-    });
-
-    const progressStops = [
-      { chapterIndex: 0 },
-      { chapterIndex: 1 },
-      { chapterIndex: 3 },
-      { chapterIndex: 4 }
-    ];
-
-    progressStops.forEach((stop) => {
-      const chapter = chapters[stop.chapterIndex];
-      const dot = document.createElement("button");
-      dot.className = "dot";
-      dot.type = "button";
-      dot.setAttribute("aria-label", chapter.title);
-      dot.addEventListener("click", () => {
-        const top = journey.offsetTop + (journey.offsetHeight - window.innerHeight) * (stop.chapterIndex / (chapters.length - 1));
-        window.scrollTo({ top, behavior: "smooth" });
-      });
-      dots.appendChild(dot);
-    });
-
-    const sceneImages = [...document.querySelectorAll(".scene-img")];
-    const dotButtons = [...document.querySelectorAll(".dot")];
-    const runWhenIdle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 500));
-    const videoPrompts = [
-      {
-        label: "上海",
-        text: "20世纪初上海新式学堂场景，青年学生在教室中唱歌，窗外有五四时期的城市氛围。画面表现学堂乐歌《送别》的启蒙气质，中西结合、兼收并蓄，张闻天青年时代在这样的歌声中成长。复古插画风，镜头缓慢推进，无字幕。"
-      },
-      {
-        label: "陕北",
-        text: "1940年代陕北黄河岸边，船工在黄河上拉纤、划船，众人配合呼喊号子。风沙、河浪、黄土高坡，表现《黄河船夫曲》的粗犷豪迈，根植乡土、魂系家国。音乐家深入民间，用人民熟悉的旋律唱出革命信念，无字幕。"
-      },
-      {
-        label: "合江",
-        text: "1940年代东北合江佳木斯工厂，工人们在车间中集体劳动，机器运转，火花和蒸汽。表现《咱们工人有力量》的劳动号子气质，讴歌劳动、质朴铿锵。张闻天鼓励文艺工作者到工人中间去，艺术从生活中来，复古宣传画风，无字幕。"
-      }
-    ];
-
-    function setPrompt(index) {
-      const prompt = videoPrompts[index];
-      promptBox.value = prompt.text;
-      [...promptTabs.children].forEach((tab, tabIndex) => {
-        tab.classList.toggle("active", tabIndex === index);
-      });
-      copyState.textContent = "";
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
     }
 
-    videoPrompts.forEach((prompt, index) => {
-      const button = document.createElement("button");
-      button.className = "prompt-tab";
-      button.type = "button";
-      button.textContent = prompt.label;
-      button.addEventListener("click", () => setPrompt(index));
-      promptTabs.appendChild(button);
-    });
-    setPrompt(0);
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
-    copyPrompt.addEventListener("click", async () => {
-      promptBox.focus();
-      promptBox.select();
-      try {
-        await navigator.clipboard.writeText(promptBox.value);
-        copyState.textContent = "已复制";
-      } catch (error) {
-        document.execCommand("copy");
-        copyState.textContent = "已复制";
-      }
-    });
+    function getProgressDotIndex(chapterIndex) {
+      if (chapterIndex <= 0) return 0;
+      if (chapterIndex === 1) return 1;
+      if (chapterIndex === 2) return 2;
+      return 3;
+    }
 
-    videoUpload.addEventListener("change", () => {
-      const file = videoUpload.files && videoUpload.files[0];
-      if (!file) return;
-      if (userVideo.dataset.objectUrl) {
-        URL.revokeObjectURL(userVideo.dataset.objectUrl);
+    function buildDots(currentChapterIndex) {
+      const activeDotIndex = getProgressDotIndex(currentChapterIndex);
+      return progressStops.map((stop, dotIndex) => {
+        const activeClass = dotIndex === activeDotIndex ? " active" : "";
+        return `<button class="dot${activeClass}" type="button" data-jump-chapter="${stop.chapterIndex}" aria-label="${escapeHtml(stop.label)}"></button>`;
+      }).join("");
+    }
+
+
+
+    function renderFixedProgressDots() {
+      if (!fixedProgressDots) return;
+      fixedProgressDots.innerHTML = progressStops.map((stop) => {
+        return `<button class="dot" type="button" data-jump-chapter="${stop.chapterIndex}" aria-label="${escapeHtml(stop.label)}"></button>`;
+      }).join("");
+    }
+
+    function updateGlobalProgress(activeChapterIndex = -1) {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const globalProgress = clamp(window.scrollY / maxScroll, 0, 1);
+      if (fixedTimelineFill) {
+        fixedTimelineFill.style.setProperty("--global-progress", globalProgress);
       }
-      const objectUrl = URL.createObjectURL(file);
-      userVideo.dataset.objectUrl = objectUrl;
-      userVideo.src = objectUrl;
-      videoFrame.classList.add("has-video");
-      uploadState.textContent = file.name;
-    });
+
+      if (fixedProgressDots) {
+        const activeDotIndex = activeChapterIndex >= 0 ? getProgressDotIndex(activeChapterIndex) : 0;
+        [...fixedProgressDots.children].forEach((dot, dotIndex) => {
+          dot.classList.toggle("active", dotIndex === activeDotIndex);
+        });
+      }
+    }
+
+    function renderStoryPage(chapter, index) {
+      const section = document.createElement("section");
+      section.className = `story-page${chapter.longPage ? " is-long" : ""}`;
+      section.id = `chapter-${index}`;
+      section.dataset.chapterIndex = String(index);
+      const sceneItems = chapter.scenes || [{ src: chapter.scene, wide: chapter.wide, sceneClass: chapter.sceneClass }];
+      const sceneMarkup = sceneItems.map((scene, sceneIndex) => {
+        const sceneClass = ["scene-img", scene.wide ? "is-wide" : "", scene.sceneClass || "", sceneIndex === 0 ? "active" : ""].filter(Boolean).join(" ");
+        return `<img class="${sceneClass}" data-scene-step="${sceneIndex}" src="${asset(scene.src)}" alt="" decoding="async" />`;
+      }).join("");
+      section.innerHTML = `
+        <div class="stage">
+          <div class="sky"></div>
+          <div class="scenery" aria-hidden="true">
+            ${sceneMarkup}
+          </div>
+          <div class="road-wrap" aria-hidden="true"><div class="road"></div></div>
+          <article class="content-panel" aria-live="polite">
+            <p class="page-mini-title">${escapeHtml(chapter.title)}</p>
+            <div class="year">${escapeHtml(chapter.year)}</div>
+            <h2 class="panel-title">${escapeHtml(chapter.title)}</h2>
+            <p class="panel-copy">${escapeHtml(chapter.copy)}</p>
+            <div class="song-tag">${escapeHtml(chapter.song)}</div>
+            <p class="panel-note">${escapeHtml(chapter.note)}</p>
+          </article>
+          <div class="character" aria-hidden="true">
+            <img src="${asset(frames[chapter.age][0])}" alt="" decoding="async" />
+          </div>
+          <div class="chapter-label">${escapeHtml(chapter.label)}</div>
+          <div class="timeline" aria-hidden="true"><div class="timeline-fill"></div></div>
+          <div class="next-page-cue">继续下滑进入下一页</div>
+        </div>
+      `;
+      journey.appendChild(section);
+
+      pageStates.push({
+        section,
+        chapter,
+        index,
+        road: section.querySelector(".road"),
+        person: section.querySelector(".character img"),
+        sceneImages: [...section.querySelectorAll(".scene-img")],
+        timelineFill: section.querySelector(".timeline-fill"),
+        currentPersonSrc: "",
+        currentRoadSrc: "",
+        currentSceneStep: -1
+      });
+    }
+
+    function renderVideoPage(key) {
+      const prompt = videoPrompts[key];
+      if (!prompt) return;
+      const section = document.createElement("section");
+      section.className = "video-section";
+      section.id = `video-${key}`;
+      section.innerHTML = `
+        <div class="video-inner">
+          <div class="video-heading">
+            <h2>${escapeHtml(prompt.title)}</h2>
+            <p>${escapeHtml(prompt.intro)}</p>
+          </div>
+          <div class="ai-lab" aria-label="${escapeHtml(prompt.label)}AI视频共创">
+            <div class="ai-tool">
+              <h2>${escapeHtml(prompt.label)}提示词</h2>
+              <textarea class="prompt-box" aria-label="${escapeHtml(prompt.label)}即梦视频提示词">${escapeHtml(prompt.text)}</textarea>
+              <div class="ai-actions">
+                <button class="ai-action primary" type="button" data-copy-local-prompt>复制提示词</button>
+                <a class="ai-action" href="https://jimeng.jianying.com/" target="_blank" rel="noopener noreferrer">去即梦生成</a>
+                <span class="copy-state"></span>
+              </div>
+            </div>
+            <div class="video-drop">
+              <h2>${escapeHtml(prompt.label)}视频播放</h2>
+              <div class="video-frame">
+                <video controls playsinline></video>
+                <div class="video-placeholder">上传${escapeHtml(prompt.label)}场景视频后，在这里播放。</div>
+              </div>
+              <div class="upload-row">
+                <label class="upload-button">
+                  上传视频
+                  <input class="video-input" type="file" accept="video/mp4,video/webm,video/quicktime,video/*" data-local-video-upload>
+                </label>
+                <span class="upload-state"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      journey.appendChild(section);
+    }
+
+    function renderPages() {
+      chapters.forEach((chapter, index) => {
+        renderStoryPage(chapter, index);
+        if (chapter.videoKey) renderVideoPage(chapter.videoKey);
+      });
+    }
 
     function loadChapterAssets(index) {
-      const chapter = chapters[index];
-      if (!chapter) return;
-      const sceneImage = sceneImages[index];
-      if (sceneImage && !sceneImage.src) {
-        sceneImage.src = sceneImage.dataset.src;
-      }
       resolveChapterAssets(index).forEach(preload);
     }
 
-    function warmNextChapter(index) {
-      runWhenIdle(() => {
-        loadChapterAssets(index - 1);
-        loadChapterAssets(index + 1);
-      });
-    }
-
     function warmAllChapters() {
+      const runWhenIdle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 500));
       let index = 0;
       const warm = () => {
         loadChapterAssets(index);
@@ -1051,55 +1250,7 @@
       runWhenIdle(warm);
     }
 
-    function clamp(value, min, max) {
-      return Math.min(max, Math.max(min, value));
-    }
-
-    function getProgressDotIndex(chapterIndex) {
-      if (chapterIndex <= 0) return 0;
-      if (chapterIndex <= 2) return 1;
-      if (chapterIndex === 3) return 2;
-      return 3;
-    }
-
-    function setChapter(index) {
-      if (index === activeIndex) return;
-      activeIndex = index;
-      const chapter = chapters[index];
-      year.textContent = chapter.year;
-      title.textContent = chapter.title;
-      copy.textContent = chapter.copy;
-      song.textContent = chapter.song;
-      note.textContent = chapter.note;
-      chapterLabel.textContent = chapter.label;
-      loadChapterAssets(index);
-      warmNextChapter(index);
-      sceneImages.forEach((img, i) => img.classList.toggle("active", i === index));
-      const activeDotIndex = getProgressDotIndex(index);
-      dotButtons.forEach((dot, i) => dot.classList.toggle("active", i === activeDotIndex));
-    }
-
-    function update() {
-      const start = journey.offsetTop;
-      const distance = journey.offsetHeight - window.innerHeight;
-      const progress = clamp((window.scrollY - start) / distance, 0, 1);
-      const chapterProgress = progress * (chapters.length - 1);
-      const index = clamp(Math.round(chapterProgress), 0, chapters.length - 1);
-      const chapter = chapters[index];
-      const frameSet = frames[chapter.age];
-      const frameIndex = isScrolling ? Math.floor(progress * 48) % frameSet.length : 0;
-
-      setChapter(index);
-      const nextPersonSrc = asset(frameSet[frameIndex]);
-      const nextRoadSrc = asset(chapter.road);
-      if (nextPersonSrc !== currentPersonSrc) {
-        currentPersonSrc = nextPersonSrc;
-        person.src = nextPersonSrc;
-      }
-      if (nextRoadSrc !== currentRoadSrc) {
-        currentRoadSrc = nextRoadSrc;
-        road.style.backgroundImage = `url("${nextRoadSrc}")`;
-      }
+    function applyRoadStyle(chapter, road) {
       if (chapter.road.includes("stone")) {
         road.style.setProperty("--road-size", "clamp(300px, 44vw, 460px) auto");
         road.style.setProperty("--road-repeat", "repeat");
@@ -1110,8 +1261,65 @@
         road.style.setProperty("--road-size", "cover");
         road.style.setProperty("--road-repeat", "repeat-y");
       }
-      road.style.setProperty("--road-y", `${-progress * 42}%`);
-      timelineFill.style.setProperty("--progress", progress);
+    }
+
+    function updateStoryPages() {
+      let bestIndex = -1;
+      let bestScore = Infinity;
+      const viewportMiddle = window.innerHeight * 0.5;
+
+      pageStates.forEach((state) => {
+        const rect = state.section.getBoundingClientRect();
+        const distanceToMiddle = Math.abs(rect.top + rect.height * 0.5 - viewportMiddle);
+        if (rect.top < window.innerHeight && rect.bottom > 0 && distanceToMiddle < bestScore) {
+          bestIndex = state.index;
+          bestScore = distanceToMiddle;
+        }
+      });
+
+      pageStates.forEach((state) => {
+        const { section, chapter, index, road, person, timelineFill } = state;
+        const rect = section.getBoundingClientRect();
+        const distance = Math.max(1, section.offsetHeight - window.innerHeight);
+        const pageProgress = clamp(-rect.top / distance, 0, 1);
+        const isActive = index === bestIndex;
+        const frameSet = frames[chapter.age];
+        const frameIndex = isScrolling && isActive ? Math.floor((pageProgress * 20) + (window.scrollY / 72)) % frameSet.length : 0;
+        const nextPersonSrc = asset(frameSet[frameIndex]);
+        const nextRoadSrc = asset(chapter.road);
+        const totalProgress = clamp((index + pageProgress) / (chapters.length - 1), 0, 1);
+
+        section.classList.toggle("is-active", isActive);
+        if (rect.top < window.innerHeight * 0.8) section.classList.add("is-seen");
+
+        if (state.sceneImages && state.sceneImages.length > 1) {
+          const sceneStep = pageProgress < 0.52 ? 0 : 1;
+          if (sceneStep !== state.currentSceneStep) {
+            state.currentSceneStep = sceneStep;
+            state.sceneImages.forEach((img, imgIndex) => {
+              img.classList.toggle("active", imgIndex === sceneStep);
+            });
+          }
+        } else if (state.sceneImages && state.sceneImages.length === 1) {
+          state.sceneImages[0].classList.add("active");
+        }
+
+        if (nextPersonSrc !== state.currentPersonSrc) {
+          state.currentPersonSrc = nextPersonSrc;
+          person.src = nextPersonSrc;
+        }
+
+        if (nextRoadSrc !== state.currentRoadSrc) {
+          state.currentRoadSrc = nextRoadSrc;
+          road.style.backgroundImage = `url("${nextRoadSrc}")`;
+        }
+
+        applyRoadStyle(chapter, road);
+        road.style.setProperty("--road-y", `${-pageProgress * 42}%`);
+        if (timelineFill) timelineFill.style.setProperty("--progress", totalProgress);
+      });
+
+      updateGlobalProgress(bestIndex);
     }
 
     function requestUpdate() {
@@ -1119,9 +1327,74 @@
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
-        update();
+        updateStoryPages();
       });
     }
+
+    function replayIntroRoute() {
+      introMap.classList.remove("is-playing");
+      void introMap.offsetWidth;
+      introMap.classList.add("is-playing");
+    }
+
+    function copyTextFromTextarea(textarea, stateElement) {
+      textarea.focus();
+      textarea.select();
+      const done = () => {
+        stateElement.textContent = "已复制";
+        window.setTimeout(() => {
+          stateElement.textContent = "";
+        }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textarea.value).then(done).catch(() => {
+          document.execCommand("copy");
+          done();
+        });
+      } else {
+        document.execCommand("copy");
+        done();
+      }
+    }
+
+    function attachLocalVideo(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const section = input.closest(".video-drop");
+      const video = section.querySelector("video");
+      const frame = section.querySelector(".video-frame");
+      const state = section.querySelector(".upload-state");
+      if (video.dataset.objectUrl) URL.revokeObjectURL(video.dataset.objectUrl);
+      const objectUrl = URL.createObjectURL(file);
+      video.dataset.objectUrl = objectUrl;
+      video.src = objectUrl;
+      frame.classList.add("has-video");
+      state.textContent = file.name;
+    }
+
+    renderPages();
+    renderFixedProgressDots();
+
+    document.addEventListener("click", (event) => {
+      const dot = event.target.closest("[data-jump-chapter]");
+      if (dot) {
+        const targetIndex = Number(dot.dataset.jumpChapter);
+        const target = document.getElementById(`chapter-${targetIndex}`);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      const localCopyButton = event.target.closest("[data-copy-local-prompt]");
+      if (localCopyButton) {
+        const panel = localCopyButton.closest(".ai-tool");
+        copyTextFromTextarea(panel.querySelector(".prompt-box"), panel.querySelector(".copy-state"));
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      const input = event.target.closest("[data-local-video-upload]");
+      if (input) attachLocalVideo(input);
+    });
 
     window.addEventListener("scroll", () => {
       isScrolling = true;
@@ -1132,12 +1405,8 @@
       }, 120);
       requestUpdate();
     }, { passive: true });
+
     window.addEventListener("resize", requestUpdate);
-    function replayIntroRoute() {
-      introMap.classList.remove("is-playing");
-      void introMap.offsetWidth;
-      introMap.classList.add("is-playing");
-    }
 
     const introObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -1148,8 +1417,33 @@
     }, { threshold: [0.55] });
 
     introObserver.observe(intro);
+
+    const promptList = [videoPrompts.shanghai, videoPrompts.yanan, videoPrompts.hejiang];
+
+    function setPrompt(index) {
+      const prompt = promptList[index];
+      promptBox.value = prompt.text;
+      [...promptTabs.children].forEach((tab, tabIndex) => {
+        tab.classList.toggle("active", tabIndex === index);
+      });
+      copyState.textContent = "";
+    }
+
+    promptList.forEach((prompt, index) => {
+      const button = document.createElement("button");
+      button.className = "prompt-tab";
+      button.type = "button";
+      button.textContent = prompt.label;
+      button.addEventListener("click", () => setPrompt(index));
+      promptTabs.appendChild(button);
+    });
+
+    copyPrompt.addEventListener("click", () => copyTextFromTextarea(promptBox, copyState));
+
+
+    setPrompt(0);
     replayIntroRoute();
-    update();
+    updateStoryPages();
     warmAllChapters();
   </script>
 </body>
