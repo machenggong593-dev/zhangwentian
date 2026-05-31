@@ -633,8 +633,9 @@
     }
 
     .classin-note {
-      margin: 22px 0 0;
-      padding-top: 16px;
+      width: min(680px, 100%);
+      margin: 34px auto 0;
+      padding-top: 18px;
       border-top: 1px solid rgba(247, 234, 211, 0.18);
       color: rgba(247, 234, 211, 0.86);
       font-size: 15px;
@@ -1790,7 +1791,7 @@
       const button = document.createElement("button");
       button.className = "prompt-tab";
       button.type = "button";
-      button.textContent = prompt.label;
+      button.textContent = `示例${index + 1}`;
       button.addEventListener("click", () => setPrompt(index));
       promptTabs.appendChild(button);
     });
