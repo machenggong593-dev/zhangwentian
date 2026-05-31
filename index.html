@@ -642,6 +642,113 @@
       text-align: center;
     }
 
+    .material-shelf {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(247, 234, 211, 0.18);
+    }
+
+    .material-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .material-heading h3 {
+      margin: 0;
+      color: #f7ead3;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .material-heading p {
+      margin: 0;
+      max-width: 390px;
+      color: rgba(247, 234, 211, 0.72);
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: right;
+    }
+
+    .material-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .material-card {
+      display: grid;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid rgba(247, 234, 211, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 248, 232, 0.07);
+    }
+
+    .material-preview {
+      display: grid;
+      place-items: center;
+      height: 134px;
+      border-radius: 7px;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(247, 234, 211, 0.16), transparent 58%),
+        rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .material-preview img {
+      max-width: 100%;
+      max-height: 124px;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.22));
+    }
+
+    .material-name {
+      margin: 0;
+      color: #f7ead3;
+      font-size: 14px;
+      line-height: 1.3;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .material-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid rgba(201, 146, 63, 0.72);
+      border-radius: 6px;
+      color: #f7ead3;
+      background: rgba(143, 31, 27, 0.42);
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .material-download:hover,
+    .material-download:focus-visible {
+      border-color: rgba(201, 146, 63, 0.95);
+      background: rgba(143, 31, 27, 0.62);
+    }
+
+    .material-download.is-loading {
+      opacity: 0.72;
+      pointer-events: none;
+    }
+
+    .material-state {
+      min-height: 16px;
+      color: rgba(247, 234, 211, 0.68);
+      font-size: 12px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
     .ai-tool,
     .video-drop {
       border: 1px solid rgba(247, 234, 211, 0.18);
@@ -892,6 +999,29 @@
         grid-template-columns: 1fr;
       }
 
+      .material-heading {
+        display: grid;
+        gap: 6px;
+        text-align: center;
+        justify-items: center;
+      }
+
+      .material-heading p {
+        text-align: center;
+      }
+
+      .material-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .material-preview {
+        height: 122px;
+      }
+
+      .material-preview img {
+        max-height: 112px;
+      }
+
       .video-frame {
         max-height: none;
       }
@@ -935,6 +1065,13 @@
               <span class="copy-state" id="copyState"></span>
             </div>
             <p class="classin-note">生成后将视频在classin班级作业中提交</p>
+            <div class="material-shelf" aria-label="角色站立图素材栏">
+              <div class="material-heading">
+                <h3>角色素材栏</h3>
+                <p>下载角色站立图，作为AI视频生成参考素材。</p>
+              </div>
+              <div class="material-grid" id="materialShelf"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1027,6 +1164,13 @@
       "中年": ["assets/characters/middle-1.webp", "assets/characters/middle-2.webp", "assets/characters/middle-3.webp"]
     };
 
+    const roleMaterials = [
+      { label: "少年", age: "少年", src: frames["少年"][0], filename: "少年.webp" },
+      { label: "青年", age: "青年", src: frames["青年"][0], filename: "青年.webp" },
+      { label: "壮年", age: "壮年", src: frames["壮年"][0], filename: "壮年.webp" },
+      { label: "中年", age: "中年", src: frames["中年"][0], filename: "中年.webp" }
+    ];
+
     const videoPrompts = {
       shanghai: {
         label: "上海",
@@ -1062,6 +1206,7 @@
     const promptBox = document.getElementById("promptBox");
     const copyPrompt = document.getElementById("copyPrompt");
     const copyState = document.getElementById("copyState");
+    const materialShelf = document.getElementById("materialShelf");
     const fixedTimelineFill = document.getElementById("fixedTimelineFill");
     const fixedProgressDots = document.getElementById("fixedProgressDots");
 
@@ -1228,6 +1373,67 @@
       journey.appendChild(section);
     }
 
+    function renderMaterialShelf() {
+      if (!materialShelf) return;
+      materialShelf.innerHTML = roleMaterials.map((item) => {
+        const src = asset(item.src);
+        return `
+          <article class="material-card">
+            <div class="material-preview">
+              <img src="${src}" alt="${escapeHtml(item.label)}站立图" decoding="async" loading="lazy" />
+            </div>
+            <p class="material-name">${escapeHtml(item.label)}</p>
+            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-asset-path="${escapeHtml(item.src)}" data-file-name="${escapeHtml(item.filename)}">下载站立图</a>
+            <span class="material-state" aria-live="polite"></span>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function downloadMaterial(link) {
+      const path = link.dataset.assetPath;
+      const filename = link.dataset.fileName || "角色站立图.webp";
+      const state = link.parentElement.querySelector(".material-state");
+      const src = asset(path);
+      const fallbackOpen = () => {
+        const fallback = document.createElement("a");
+        fallback.href = src;
+        fallback.download = filename;
+        fallback.target = "_blank";
+        fallback.rel = "noopener noreferrer";
+        document.body.appendChild(fallback);
+        fallback.click();
+        fallback.remove();
+      };
+
+      link.classList.add("is-loading");
+      if (state) state.textContent = "正在准备下载…";
+
+      try {
+        if (location.protocol === "file:") throw new Error("local file fallback");
+        const response = await fetch(src, { mode: "cors" });
+        if (!response.ok) throw new Error("download failed");
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
+        if (state) state.textContent = "已开始下载";
+      } catch (error) {
+        fallbackOpen();
+        if (state) state.textContent = "已打开素材，可右键保存";
+      } finally {
+        window.setTimeout(() => {
+          link.classList.remove("is-loading");
+          if (state) state.textContent = "";
+        }, 1800);
+      }
+    }
+
     function renderPages() {
       chapters.forEach((chapter, index) => {
         renderStoryPage(chapter, index);
@@ -1374,6 +1580,7 @@
 
     renderPages();
     renderFixedProgressDots();
+    renderMaterialShelf();
 
     document.addEventListener("click", (event) => {
       const dot = event.target.closest("[data-jump-chapter]");
@@ -1381,6 +1588,13 @@
         const targetIndex = Number(dot.dataset.jumpChapter);
         const target = document.getElementById(`chapter-${targetIndex}`);
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      const materialDownload = event.target.closest("[data-download-material]");
+      if (materialDownload) {
+        event.preventDefault();
+        downloadMaterial(materialDownload);
         return;
       }
 
