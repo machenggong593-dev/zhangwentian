@@ -799,6 +799,21 @@
       text-align: center;
     }
 
+    .material-lazy-state {
+      grid-column: 1 / -1;
+      min-height: 96px;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 18px;
+      border: 1px dashed rgba(247, 234, 211, 0.18);
+      border-radius: 8px;
+      color: rgba(247, 234, 211, 0.68);
+      background: rgba(255, 248, 232, 0.05);
+      font-size: 13px;
+      text-align: center;
+    }
+
     .ai-tool,
     .video-drop {
       border: 1px solid rgba(247, 234, 211, 0.18);
@@ -1138,26 +1153,42 @@
 
 
   <script>
-    const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
-    const ASSET_VERSION = "material-cdn-v2";
-    const MATERIAL_CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
-    const MATERIAL_RAW_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
+    const ASSET_VERSION = "github-pages-zhangwentian-v5";
+    const GITHUB_PAGES_BASE = "https://machenggong593-dev.github.io/zhangwentian/";
+    const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
+    const RAW_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
     const encodeAssetPath = (path) => path.split("/").map(encodeURIComponent).join("/");
+    const withVersion = (url) => `${url}${url.includes("?") ? "&" : "?"}v=${ASSET_VERSION}`;
 
+    const getCurrentPageBase = () => new URL("./", window.location.href).href;
+    const makeUrl = (base, path, versioned = true) => {
+      const url = new URL(encodeAssetPath(path), base).href;
+      return versioned ? withVersion(url) : url;
+    };
+
+    // GitHub Pages 专用：页面动画、道路、角色等资源优先从当前 Pages 项目读取，
+    // 避免每个资源都绕到 jsDelivr，国内访问会更稳。
     const asset = (path) => {
       if (location.protocol === "file:") return path;
-      return `${CDN_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
+      return makeUrl(getCurrentPageBase(), path);
     };
 
-    const materialAsset = (path) => {
-      if (location.protocol === "file:") return path;
-      return `${MATERIAL_CDN_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
+    // 素材栏专用：优先当前项目，其次固定到 zhangwentian Pages，
+    // 最后才兜底 jsDelivr 和 GitHub Raw。
+    const materialSources = (path) => {
+      if (location.protocol === "file:") return [path];
+      const encoded = encodeAssetPath(path);
+      const candidates = [
+        makeUrl(getCurrentPageBase(), path),
+        makeUrl(GITHUB_PAGES_BASE, path),
+        `${CDN_BASE}${encoded}?v=${ASSET_VERSION}`,
+        `${RAW_BASE}${encoded}?v=${ASSET_VERSION}`
+      ];
+      return [...new Set(candidates)];
     };
 
-    const materialFallbackAsset = (path) => {
-      if (location.protocol === "file:") return path;
-      return `${MATERIAL_RAW_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
-    };
+    const materialAsset = (path) => materialSources(path)[0];
+    const materialFallbacks = (path) => materialSources(path).slice(1);
 
     const chapters = [
       {
@@ -1331,6 +1362,7 @@
     const loadedAssets = new Set();
     const pageStates = [];
     let activeMaterialKey = materialGroups[0].key;
+    let materialShelfReady = false;
 
     function preload(src) {
       if (loadedAssets.has(src)) return;
@@ -1503,26 +1535,44 @@
 
     function renderMaterialShelf() {
       if (!materialShelf) return;
+      materialShelfReady = true;
       const group = getMaterialGroup(activeMaterialKey);
       if (materialPanelNote) materialPanelNote.textContent = group.note;
       materialShelf.innerHTML = group.items.map((item) => {
-        const src = materialAsset(item.src);
-        const fallbackSrc = materialFallbackAsset(item.src);
+        const sources = materialSources(item.src);
+        const src = sources[0];
+        const fallbackSrcs = sources.slice(1).join("|");
         const type = item.type || "image";
         const downloadText = type === "audio" ? "下载MP3" : "下载PNG";
         const cardClass = ["material-card", item.cardClass || "", type === "audio" ? "is-audio" : ""].filter(Boolean).join(" ");
         const preview = type === "audio"
-          ? `<div class="material-audio-preview"><audio controls preload="none" src="${src}" data-fallback-src="${fallbackSrc}"></audio></div>`
-          : `<div class="material-preview"><img src="${src}" data-fallback-src="${fallbackSrc}" alt="${escapeHtml(item.label)}" decoding="async" loading="lazy" fetchpriority="low" referrerpolicy="no-referrer" /></div>`;
+          ? `<div class="material-audio-preview"><audio controls preload="none" src="${src}" data-fallback-srcs="${escapeHtml(fallbackSrcs)}"></audio></div>`
+          : `<div class="material-preview"><img src="${src}" data-fallback-srcs="${escapeHtml(fallbackSrcs)}" alt="${escapeHtml(item.label)}" decoding="async" loading="lazy" fetchpriority="low" referrerpolicy="no-referrer" /></div>`;
         return `
           <article class="${cardClass}">
             ${preview}
             <p class="material-name">${escapeHtml(item.label)}</p>
-            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-fallback-href="${fallbackSrc}" data-file-name="${escapeHtml(item.filename)}" data-file-type="${escapeHtml(type)}">${downloadText}</a>
+            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-fallback-srcs="${escapeHtml(sources.slice(1).join("|"))}" data-file-name="${escapeHtml(item.filename)}" data-file-type="${escapeHtml(type)}">${downloadText}</a>
             <span class="material-state" aria-live="polite"></span>
           </article>
         `;
       }).join("");
+    }
+
+    function deferMaterialShelf() {
+      if (!materialShelf) return;
+      materialShelf.innerHTML = `<p class="material-lazy-state">素材栏将在滚动到这里时加载，优先读取当前 zhangwentian GitHub Pages 项目资源。</p>`;
+      if (!("IntersectionObserver" in window)) {
+        renderMaterialShelf();
+        return;
+      }
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          renderMaterialShelf();
+        }
+      }, { rootMargin: "360px 0px" });
+      observer.observe(materialShelf);
     }
 
     function setMaterialGroup(key) {
@@ -1535,10 +1585,10 @@
       const type = link.dataset.fileType || "image";
       const filename = link.dataset.fileName || (type === "audio" ? "音乐示例.mp3" : "素材.png");
       const state = link.parentElement.querySelector(".material-state");
-      const src = link.href;
-      const fallbackSrc = link.dataset.fallbackHref || src;
+      const urls = [link.href, ...(link.dataset.fallbackSrcs || "").split("|").filter(Boolean)];
       const fileLabel = type === "audio" ? "MP3" : "PNG";
-      const fallbackOpen = (url = fallbackSrc) => {
+
+      const fallbackOpen = (url = urls[0]) => {
         const fallback = document.createElement("a");
         fallback.href = url;
         fallback.target = "_blank";
@@ -1552,9 +1602,18 @@
       if (state) state.textContent = `正在下载${fileLabel}…`;
 
       try {
-        const response = await fetch(src, { mode: "cors", cache: "force-cache" });
-        if (!response.ok) throw new Error("download failed");
-        const blob = await response.blob();
+        let blob = null;
+        for (const url of urls) {
+          try {
+            const response = await fetch(url, { mode: "cors", cache: "force-cache" });
+            if (!response.ok) continue;
+            blob = await response.blob();
+            break;
+          } catch (error) {
+            // 继续尝试下一个备用地址
+          }
+        }
+        if (!blob) throw new Error("download failed");
         const objectUrl = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = objectUrl;
@@ -1565,7 +1624,7 @@
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
         if (state) state.textContent = `${fileLabel}已开始下载`;
       } catch (error) {
-        fallbackOpen();
+        fallbackOpen(urls[1] || urls[0]);
         if (state) state.textContent = `已打开${fileLabel}原文件，可右键另存`;
       } finally {
         window.setTimeout(() => {
@@ -1722,7 +1781,7 @@
     renderPages();
     renderFixedProgressDots();
     renderMaterialTabs();
-    renderMaterialShelf();
+    deferMaterialShelf();
 
     document.addEventListener("click", (event) => {
       const dot = event.target.closest("[data-jump-chapter]");
@@ -1760,9 +1819,12 @@
 
     document.addEventListener("error", (event) => {
       const target = event.target;
-      if (!target || !target.dataset || !target.dataset.fallbackSrc || target.dataset.fallbackTried === "true") return;
-      target.dataset.fallbackTried = "true";
-      target.src = target.dataset.fallbackSrc;
+      if (!target || !target.dataset || !target.dataset.fallbackSrcs) return;
+      const sources = target.dataset.fallbackSrcs.split("|").filter(Boolean);
+      const nextSource = sources.shift();
+      if (!nextSource) return;
+      target.dataset.fallbackSrcs = sources.join("|");
+      target.src = nextSource;
     }, true);
 
     window.addEventListener("scroll", () => {
