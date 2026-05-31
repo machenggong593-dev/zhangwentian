@@ -633,9 +633,8 @@
     }
 
     .classin-note {
-      width: min(680px, 100%);
-      margin: 34px auto 0;
-      padding-top: 18px;
+      margin: 22px 0 0;
+      padding-top: 16px;
       border-top: 1px solid rgba(247, 234, 211, 0.18);
       color: rgba(247, 234, 211, 0.86);
       font-size: 15px;
@@ -1139,15 +1138,24 @@
 
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
-    const ASSET_VERSION = "six-storyboard-prompts-v1";
-    const RAW_MATERIAL_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
+    const ASSET_VERSION = "material-cdn-v2";
+    const MATERIAL_CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@gh-pages/";
+    const MATERIAL_RAW_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
+    const encodeAssetPath = (path) => path.split("/").map(encodeURIComponent).join("/");
+
     const asset = (path) => {
       if (location.protocol === "file:") return path;
-      return `${CDN_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
+      return `${CDN_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
     };
 
     const materialAsset = (path) => {
-      return `${RAW_MATERIAL_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
+      if (location.protocol === "file:") return path;
+      return `${MATERIAL_CDN_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
+    };
+
+    const materialFallbackAsset = (path) => {
+      if (location.protocol === "file:") return path;
+      return `${MATERIAL_RAW_BASE}${encodeAssetPath(path)}?v=${ASSET_VERSION}`;
     };
 
     const chapters = [
@@ -1161,7 +1169,7 @@
         wide: false,
         song: "课堂任务：听得见的历史",
         copy: "张闻天化身时代见证者，带同学们从上海南汇出发，回顾《送别》《黄河船夫曲》，再走向1947年的东北。",
-        note: "跟着张闻天的足迹寻找声脉地图。"
+        note: "跟着张闻天的足迹探索声脉地图。"
       },
       {
         year: "",
@@ -1498,17 +1506,18 @@
       if (materialPanelNote) materialPanelNote.textContent = group.note;
       materialShelf.innerHTML = group.items.map((item) => {
         const src = materialAsset(item.src);
+        const fallbackSrc = materialFallbackAsset(item.src);
         const type = item.type || "image";
         const downloadText = type === "audio" ? "下载MP3" : "下载PNG";
         const cardClass = ["material-card", item.cardClass || "", type === "audio" ? "is-audio" : ""].filter(Boolean).join(" ");
         const preview = type === "audio"
-          ? `<div class="material-audio-preview"><audio controls preload="none" src="${src}"></audio></div>`
-          : `<div class="material-preview"><img src="${src}" alt="${escapeHtml(item.label)}" decoding="async" loading="lazy" /></div>`;
+          ? `<div class="material-audio-preview"><audio controls preload="none" src="${src}" data-fallback-src="${fallbackSrc}"></audio></div>`
+          : `<div class="material-preview"><img src="${src}" data-fallback-src="${fallbackSrc}" alt="${escapeHtml(item.label)}" decoding="async" loading="lazy" fetchpriority="low" referrerpolicy="no-referrer" /></div>`;
         return `
           <article class="${cardClass}">
             ${preview}
             <p class="material-name">${escapeHtml(item.label)}</p>
-            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-file-name="${escapeHtml(item.filename)}" data-file-type="${escapeHtml(type)}">${downloadText}</a>
+            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-fallback-href="${fallbackSrc}" data-file-name="${escapeHtml(item.filename)}" data-file-type="${escapeHtml(type)}">${downloadText}</a>
             <span class="material-state" aria-live="polite"></span>
           </article>
         `;
@@ -1526,10 +1535,11 @@
       const filename = link.dataset.fileName || (type === "audio" ? "音乐示例.mp3" : "素材.png");
       const state = link.parentElement.querySelector(".material-state");
       const src = link.href;
+      const fallbackSrc = link.dataset.fallbackHref || src;
       const fileLabel = type === "audio" ? "MP3" : "PNG";
-      const fallbackOpen = () => {
+      const fallbackOpen = (url = fallbackSrc) => {
         const fallback = document.createElement("a");
-        fallback.href = src;
+        fallback.href = url;
         fallback.target = "_blank";
         fallback.rel = "noopener noreferrer";
         document.body.appendChild(fallback);
@@ -1541,7 +1551,7 @@
       if (state) state.textContent = `正在下载${fileLabel}…`;
 
       try {
-        const response = await fetch(src, { mode: "cors", cache: "no-cache" });
+        const response = await fetch(src, { mode: "cors", cache: "force-cache" });
         if (!response.ok) throw new Error("download failed");
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
@@ -1747,6 +1757,13 @@
       if (input) attachLocalVideo(input);
     });
 
+    document.addEventListener("error", (event) => {
+      const target = event.target;
+      if (!target || !target.dataset || !target.dataset.fallbackSrc || target.dataset.fallbackTried === "true") return;
+      target.dataset.fallbackTried = "true";
+      target.src = target.dataset.fallbackSrc;
+    }, true);
+
     window.addEventListener("scroll", () => {
       isScrolling = true;
       window.clearTimeout(scrollStopTimer);
@@ -1791,7 +1808,7 @@
       const button = document.createElement("button");
       button.className = "prompt-tab";
       button.type = "button";
-      button.textContent = `示例${index + 1}`;
+      button.textContent = prompt.label;
       button.addEventListener("click", () => setPrompt(index));
       promptTabs.appendChild(button);
     });
