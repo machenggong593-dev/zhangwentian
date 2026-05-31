@@ -633,8 +633,8 @@
     }
 
     .classin-note {
-      margin: 14px 0 0;
-      padding-top: 12px;
+      margin: 22px 0 0;
+      padding-top: 16px;
       border-top: 1px solid rgba(247, 234, 211, 0.18);
       color: rgba(247, 234, 211, 0.86);
       font-size: 15px;
@@ -643,8 +643,8 @@
     }
 
     .material-shelf {
-      margin-top: 16px;
-      padding-top: 16px;
+      margin-top: 18px;
+      padding-top: 18px;
       border-top: 1px solid rgba(247, 234, 211, 0.18);
     }
 
@@ -665,16 +665,47 @@
 
     .material-heading p {
       margin: 0;
-      max-width: 390px;
+      max-width: 430px;
       color: rgba(247, 234, 211, 0.72);
       font-size: 13px;
       line-height: 1.55;
       text-align: right;
     }
 
+    .material-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .material-tab {
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid rgba(247, 234, 211, 0.28);
+      border-radius: 6px;
+      color: #f7ead3;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .material-tab.active {
+      border-color: rgba(201, 146, 63, 0.8);
+      background: rgba(143, 31, 27, 0.5);
+    }
+
+    .material-panel-note {
+      margin: 0 0 12px;
+      color: rgba(247, 234, 211, 0.7);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
     .material-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
       gap: 12px;
     }
 
@@ -687,10 +718,11 @@
       background: rgba(255, 248, 232, 0.07);
     }
 
-    .material-preview {
+    .material-preview,
+    .material-audio-preview {
       display: grid;
       place-items: center;
-      height: 134px;
+      min-height: 134px;
       border-radius: 7px;
       background:
         radial-gradient(circle at 50% 38%, rgba(247, 234, 211, 0.16), transparent 58%),
@@ -703,6 +735,24 @@
       max-height: 124px;
       object-fit: contain;
       filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.22));
+    }
+
+    .material-card.is-storyboard .material-preview {
+      min-height: 112px;
+    }
+
+    .material-card.is-storyboard .material-preview img {
+      width: 100%;
+      max-height: 130px;
+    }
+
+    .material-audio-preview {
+      min-height: 96px;
+      padding: 12px;
+    }
+
+    .material-audio-preview audio {
+      width: 100%;
     }
 
     .material-name {
@@ -1064,12 +1114,14 @@
               <a class="ai-action" href="https://jimeng.jianying.com/" target="_blank" rel="noopener noreferrer">去即梦生成</a>
               <span class="copy-state" id="copyState"></span>
             </div>
-            <p class="classin-note">生成后将视频在classin班级作业中提交</p>
-            <div class="material-shelf" aria-label="角色站立图素材栏">
+            <p class="classin-note">将AI视频在classin班级作业中提交</p>
+            <div class="material-shelf" aria-label="素材栏">
               <div class="material-heading">
-                <h3>角色素材栏</h3>
-                <p>下载角色站立图，作为AI视频生成参考素材。</p>
+                <h3>素材栏</h3>
+                <p>切换查看角色、分镜头和音乐示例，下载后可作为AI视频生成参考素材。</p>
               </div>
+              <div class="material-tabs" id="materialTabs" aria-label="选择素材类型"></div>
+              <p class="material-panel-note" id="materialPanelNote"></p>
               <div class="material-grid" id="materialShelf"></div>
             </div>
           </div>
@@ -1086,10 +1138,15 @@
 
   <script>
     const CDN_BASE = "https://cdn.jsdelivr.net/gh/machenggong593-dev/zhangwentian@cd05b4a/";
-    const ASSET_VERSION = "ai-video-only-v1";
+    const ASSET_VERSION = "multi-material-shelf-v1";
+    const RAW_MATERIAL_BASE = "https://raw.githubusercontent.com/machenggong593-dev/zhangwentian/gh-pages/";
     const asset = (path) => {
       if (location.protocol === "file:") return path;
       return `${CDN_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
+    };
+
+    const materialAsset = (path) => {
+      return `${RAW_MATERIAL_BASE}${path.split("/").map(encodeURIComponent).join("/")}?v=${ASSET_VERSION}`;
     };
 
     const chapters = [
@@ -1164,11 +1221,36 @@
       "中年": ["assets/characters/middle-1.webp", "assets/characters/middle-2.webp", "assets/characters/middle-3.webp"]
     };
 
-    const roleMaterials = [
-      { label: "少年", age: "少年", src: frames["少年"][0], filename: "少年.webp" },
-      { label: "青年", age: "青年", src: frames["青年"][0], filename: "青年.webp" },
-      { label: "壮年", age: "壮年", src: frames["壮年"][0], filename: "壮年.webp" },
-      { label: "中年", age: "中年", src: frames["中年"][0], filename: "中年.webp" }
+    const materialGroups = [
+      {
+        key: "roles",
+        label: "角色示例",
+        note: "角色站立图来自仓库动画目录下各年龄段文件夹，下载格式为PNG。",
+        items: [
+          { type: "image", label: "少年", src: "动画/少年/图层 1.png", filename: "少年-站立图.png" },
+          { type: "image", label: "青年", src: "动画/青年/图层 1.png", filename: "青年-站立图.png" },
+          { type: "image", label: "壮年", src: "动画/壮年/图层 1.png", filename: "壮年-站立图.png" },
+          { type: "image", label: "中年", src: "动画/中年/图层 1.png", filename: "中年-站立图.png" }
+        ]
+      },
+      {
+        key: "storyboards",
+        label: "分镜头示例",
+        note: "分镜头示例来自动画/分镜头文件夹，下载格式为PNG。",
+        items: [
+          { type: "image", label: "分镜头 1", src: "动画/分镜头/1.png", filename: "分镜头-1.png", cardClass: "is-storyboard" },
+          { type: "image", label: "分镜头 2", src: "动画/分镜头/2.png", filename: "分镜头-2.png", cardClass: "is-storyboard" },
+          { type: "image", label: "分镜头 3", src: "动画/分镜头/3.png", filename: "分镜头-3.png", cardClass: "is-storyboard" }
+        ]
+      },
+      {
+        key: "music",
+        label: "音乐示例",
+        note: "音乐示例来自音乐文件夹，下载格式为MP3。",
+        items: [
+          { type: "audio", label: "音乐示例 1", src: "音乐/1.mp3", filename: "音乐示例-1.mp3" }
+        ]
+      }
     ];
 
     const videoPrompts = {
@@ -1206,6 +1288,8 @@
     const promptBox = document.getElementById("promptBox");
     const copyPrompt = document.getElementById("copyPrompt");
     const copyState = document.getElementById("copyState");
+    const materialTabs = document.getElementById("materialTabs");
+    const materialPanelNote = document.getElementById("materialPanelNote");
     const materialShelf = document.getElementById("materialShelf");
     const fixedTimelineFill = document.getElementById("fixedTimelineFill");
     const fixedProgressDots = document.getElementById("fixedProgressDots");
@@ -1215,6 +1299,7 @@
     let ticking = false;
     const loadedAssets = new Set();
     const pageStates = [];
+    let activeMaterialKey = materialGroups[0].key;
 
     function preload(src) {
       if (loadedAssets.has(src)) return;
@@ -1373,32 +1458,56 @@
       journey.appendChild(section);
     }
 
+    function getMaterialGroup(key) {
+      return materialGroups.find((group) => group.key === key) || materialGroups[0];
+    }
+
+    function renderMaterialTabs() {
+      if (!materialTabs) return;
+      materialTabs.innerHTML = materialGroups.map((group) => {
+        const activeClass = group.key === activeMaterialKey ? " active" : "";
+        return `<button class="material-tab${activeClass}" type="button" data-material-tab="${escapeHtml(group.key)}">${escapeHtml(group.label)}</button>`;
+      }).join("");
+    }
+
     function renderMaterialShelf() {
       if (!materialShelf) return;
-      materialShelf.innerHTML = roleMaterials.map((item) => {
-        const src = asset(item.src);
+      const group = getMaterialGroup(activeMaterialKey);
+      if (materialPanelNote) materialPanelNote.textContent = group.note;
+      materialShelf.innerHTML = group.items.map((item) => {
+        const src = materialAsset(item.src);
+        const type = item.type || "image";
+        const downloadText = type === "audio" ? "下载MP3" : "下载PNG";
+        const cardClass = ["material-card", item.cardClass || "", type === "audio" ? "is-audio" : ""].filter(Boolean).join(" ");
+        const preview = type === "audio"
+          ? `<div class="material-audio-preview"><audio controls preload="none" src="${src}"></audio></div>`
+          : `<div class="material-preview"><img src="${src}" alt="${escapeHtml(item.label)}" decoding="async" loading="lazy" /></div>`;
         return `
-          <article class="material-card">
-            <div class="material-preview">
-              <img src="${src}" alt="${escapeHtml(item.label)}站立图" decoding="async" loading="lazy" />
-            </div>
+          <article class="${cardClass}">
+            ${preview}
             <p class="material-name">${escapeHtml(item.label)}</p>
-            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-asset-path="${escapeHtml(item.src)}" data-file-name="${escapeHtml(item.filename)}">下载站立图</a>
+            <a class="material-download" href="${src}" download="${escapeHtml(item.filename)}" data-download-material data-file-name="${escapeHtml(item.filename)}" data-file-type="${escapeHtml(type)}">${downloadText}</a>
             <span class="material-state" aria-live="polite"></span>
           </article>
         `;
       }).join("");
     }
 
+    function setMaterialGroup(key) {
+      activeMaterialKey = getMaterialGroup(key).key;
+      renderMaterialTabs();
+      renderMaterialShelf();
+    }
+
     async function downloadMaterial(link) {
-      const path = link.dataset.assetPath;
-      const filename = link.dataset.fileName || "角色站立图.webp";
+      const type = link.dataset.fileType || "image";
+      const filename = link.dataset.fileName || (type === "audio" ? "音乐示例.mp3" : "素材.png");
       const state = link.parentElement.querySelector(".material-state");
-      const src = asset(path);
+      const src = link.href;
+      const fileLabel = type === "audio" ? "MP3" : "PNG";
       const fallbackOpen = () => {
         const fallback = document.createElement("a");
         fallback.href = src;
-        fallback.download = filename;
         fallback.target = "_blank";
         fallback.rel = "noopener noreferrer";
         document.body.appendChild(fallback);
@@ -1407,11 +1516,10 @@
       };
 
       link.classList.add("is-loading");
-      if (state) state.textContent = "正在准备下载…";
+      if (state) state.textContent = `正在下载${fileLabel}…`;
 
       try {
-        if (location.protocol === "file:") throw new Error("local file fallback");
-        const response = await fetch(src, { mode: "cors" });
+        const response = await fetch(src, { mode: "cors", cache: "no-cache" });
         if (!response.ok) throw new Error("download failed");
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
@@ -1422,15 +1530,15 @@
         anchor.click();
         anchor.remove();
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
-        if (state) state.textContent = "已开始下载";
+        if (state) state.textContent = `${fileLabel}已开始下载`;
       } catch (error) {
         fallbackOpen();
-        if (state) state.textContent = "已打开素材，可右键保存";
+        if (state) state.textContent = `已打开${fileLabel}原文件，可右键另存`;
       } finally {
         window.setTimeout(() => {
           link.classList.remove("is-loading");
           if (state) state.textContent = "";
-        }, 1800);
+        }, 2200);
       }
     }
 
@@ -1580,6 +1688,7 @@
 
     renderPages();
     renderFixedProgressDots();
+    renderMaterialTabs();
     renderMaterialShelf();
 
     document.addEventListener("click", (event) => {
@@ -1588,6 +1697,12 @@
         const targetIndex = Number(dot.dataset.jumpChapter);
         const target = document.getElementById(`chapter-${targetIndex}`);
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      const materialTab = event.target.closest("[data-material-tab]");
+      if (materialTab) {
+        setMaterialGroup(materialTab.dataset.materialTab);
         return;
       }
 
